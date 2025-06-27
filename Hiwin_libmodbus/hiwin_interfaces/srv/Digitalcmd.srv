@@ -1,0 +1,35 @@
+# mode
+uint8 DIGITAL_OUTPUT=1
+uint8 READ_DI=2
+
+
+# digital_output_cmd
+uint8 DIGITAL_ON=1
+uint8 DIGITAL_OFF=0
+
+
+
+bool holding
+uint8 cmd_mode
+uint8 do_timer
+uint8 digital_input_pin
+uint8 digital_output_pin
+uint8 digital_output_cmd
+
+
+---
+
+# arm_state
+uint8 IDLE=1
+uint8 RUNNING=2
+uint8 HOLD=3
+uint8 DELAY=4
+
+# digital_state
+uint8 ON=1
+uint8 OFF=0
+
+
+uint8 arm_state
+uint8 digital_state
+float64[] current_position
