@@ -35,7 +35,7 @@ class OrderForm(QtWidgets.QGroupBox):
         close_layout.addWidget(close_btn)
         layout.addLayout(close_layout)
 
-        for name in ["立方體", "長方體", "三角柱", "圓柱體"]:
+        for name in ["大正方體","中正方體","小正方體", "六邊柱", "三角柱", "圓柱體"]:
             h = QtWidgets.QHBoxLayout()
             label = QtWidgets.QLabel(f"{name} 數量：")
             spin = QtWidgets.QSpinBox()
