@@ -367,7 +367,6 @@ class ExampleStrategy(Node):
                 elif j == 2:
                     x += 75.0
                     print("🔁 第三個物體：夾具偏移 (x + 50)")
-                self.matrix_order[row][col] = item
                 self.sort_count_map[item] += 1
                 self.Order_palce.append([x,y,z,rx,ry,rz])
                 self.Order_palce_DOWN.append([x,y,z-50,rx,ry,rz])

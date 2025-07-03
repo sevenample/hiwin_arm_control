@@ -1,37 +1,55 @@
 import rclpy
 from rclpy.node import Node
-from hiwin_msgs.msg import OrderArray
+from hiwin_msgs.msg import CatchArray
 import threading
 
+Sorting_area_base = [
+    ([300.0, 427.0, 185.0, -180.0, 0.00, 90.00], [225.0, 427.0, 185.0, -180.0, 0.00, 90.00],[150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[75.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # A row
+    ([300.0, 566.0, 235.0, -180.0, 0.00, 90.00],[225.0, 566.0, 235.0, -180.0, 0.00, 90.00],[150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[75.0, 566.0, 235.0, -180.0, 0.00, 90.00]), # B row
+    ([0.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-75.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-225.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # C row
+    ([0.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-75.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-225.0, 566.0, 235.0, -180.0, 0.00, 90.00])   # D row
+]
 class OrderListener(Node):
     def __init__(self):
         super().__init__('order_listener')
-        self.subscription = self.create_subscription(
-            OrderArray,
-            'order_list',
-            self.listener_callback,
+        self.catch_subscription = self.create_subscription(
+            CatchArray,
+            'catch_list',
+            self.catch_callback,
             10)
         self.subscription  # prevent unused variable warning
         self.order_count = []
         self.last_timestamp = None
-
-    def listener_callback(self, msg):
+        self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
+        self.sort_order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    def catch_callback(self, msg):
         self.order_count = []
-        now = self.get_clock().now().nanoseconds
-        if self.last_timestamp is None or now - self.last_timestamp > 500_000_000:
-            self.order_count = [1]  # reset count for new submission
-        else:
-            self.order_count.append(1)
+        for j, item in enumerate(self.order_count):
+            row = self.sort_order_map[item]
+            col = self.sort_count_map[item]
 
-        self.last_timestamp = now
 
-        for count in msg.quantities:
-            self.order_count.append(count)
-        print(self.order_count)
+            # 計算位置（加上列的基礎座標 + 欄位間隔）
+            # x,y,z,rx,ry,rz = Sorting_area_base[row]
+            # x = x - col * 75.0
 
-    def start_spin_in_thread(self):
-        # 在獨立的線程中啟動 spin
-        spin_thread = threading.Thread(target=rclpy.spin, args=(self,))
-        spin_thread.daemon = True  # 當主程式結束時，線程會自動結束
-        spin_thread.start()
-        spin_thread.join()  # 確保 spin 完成後再結束主程式
+            x,y,z,rx,ry,rz = Sorting_area_base[row][col]
+
+            if j == 0:
+                x -= 75.0
+                print("👉 第一個物體：夾具偏移 (x - 50)")
+            elif j == 2:
+                x += 75.0
+                print("🔁 第三個物體：夾具偏移 (x + 50)")
+            self.sort_count_map[item] += 1
+            self.Order_palce.append([x,y,z,rx,ry,rz])
+            self.Order_palce_DOWN.append([x,y,z-50,rx,ry,rz])
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    stratery = OrderListener()
+    rclpy.spin(stratery)
+    rclpy.spin(stratery)
+    
+    rclpy.shutdown()

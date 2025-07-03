@@ -19,7 +19,8 @@ setup(
     entry_points={
         'console_scripts': [
             'hshs_gui = gui_interface.hshs_gui:main',
-            'order_listener = gui_interface.order_listener:main'
+            'order_listener = gui_interface.order_listener:main',
+            'h_gui = gui_interface.haha2:main',
         ],
     },
 )
