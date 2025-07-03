@@ -28,6 +28,8 @@ VACUUM2_PIN = 4
 
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
 
+Number_of_grips = 2
+Offset = 30
 Sorting_area_base = [
     ([300.0, 427.0, 185.0, -180.0, 0.00, 90.00], [225.0, 427.0, 185.0, -180.0, 0.00, 90.00],[150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[75.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # A row
     ([300.0, 566.0, 235.0, -180.0, 0.00, 90.00],[225.0, 566.0, 235.0, -180.0, 0.00, 90.00],[150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[75.0, 566.0, 235.0, -180.0, 0.00, 90.00]), # B row
@@ -48,6 +50,8 @@ ORDER_POSES = [
 ]
 # only for example as we don't use yolo here
 # assume NUM_OBJECTS=5, then this process will loop 5 times
+NUM_OBJECTS = 5
+order_area_num = 0
 class States(Enum):
     INIT = 0
     HOME_MOVE = 1
@@ -78,7 +82,7 @@ class States(Enum):
     CHECK_ORDER = 22
     SORT_ORDER = 23
     TT = 24  # Temporary state for processing order items
-    END_HOME = 25  # End home state after all orders are processed
+
 
 
 
@@ -91,32 +95,29 @@ class ExampleStrategy(Node):
         self.hiwin_client_mo = self.create_client(Motioncmd, 'motioncmd')
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
+        self.object_pose = None
+        self.object_cnt = 0
         
-        self.count_map =        {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0}
-        self.order_map =        {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5}
-        self.sort_count_map =   {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0}
-        self.sort_order_map =   {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5}
-        
-# --------------------測試-----------------------
+        self.matrix = [[None]*3 for _ in range(4)]
+        self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
+        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
         self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3
         random.shuffle(self.catch_items)
-
-# ---------------------分檢變數-------------------------
-        self.object_area_num = 0
-        self.item = []
-        self.Sorting_palce = []
-        self.Sorting_palce_DOWN = [] 
-        self.catch_num = 0
-
-# ---------------訂單用變數------------------
+        self.iteam = []
         self.oder_items = []   
-        self.oder_item = []  
+        self.oder_item = []   
+        self.i=0
+        self.Sorting_palce = []
+        self.Sorting_palce_DOWN = []
         self.Order_palce = []
         self.Order_palce_DOWN = []
+        self.matrix_order = [[None]*3 for _ in range(4)]
+
+        self.catch_num = 0
         self.order_catch_palce_num = 0
         self.order_palce_num = 0
-# ---------------------------------------------
-
+        self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0}
+        self.sort_order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
         # 訂閱 OrderArray 類型的訊息
         self.order_subscription = self.create_subscription(
             OrderArray,
@@ -147,6 +148,7 @@ class ExampleStrategy(Node):
         print("Catch received:", self.catch_count)
 
     def _state_machine(self, state: States) -> States:
+        global order_area_num
         if state == States.INIT:
             self.get_logger().info('INIT')
             nest_state = States.HOME_MOVE
@@ -165,27 +167,29 @@ class ExampleStrategy(Node):
 
 
         elif state == States.OBJECT_AREA:
+            self.get_logger().info('Move to object place')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.object_area_num][1],
+                pose=OBJECT_POSES[order_area_num][1],
                 holding=True
                 )
             nest_state = States.DOWN_MOVE
-            print("Directly above the object:",self.object_area_num+1)
+            print("Directly above the object:",order_area_num+1)
         
 
         elif state == States.DOWN_MOVE:
+            self.get_logger().info('down')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.object_area_num][0],
+                pose=OBJECT_POSES[order_area_num][0],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
             nest_state = States.PICK_OBJECT
-            print("Ready catch object:",self.object_area_num)
+            print("ready catch object:",order_area_num)
 
 
         elif state == States.PICK_OBJECT:
@@ -217,22 +221,23 @@ class ExampleStrategy(Node):
             print("PICK object")
             
         elif state == States.UP_MOVE:
+            self.get_logger().info(' up  ')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.object_area_num][1],
+                pose=OBJECT_POSES[order_area_num][1],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
-            self.object_area_num += 1
+            order_area_num += 1
             nest_state = States.READ_OBJECT
 
         elif state == States.READ_OBJECT:
-            self.item = self.catch_items[:3]
-            del self.catch_items[:3]
-            print(f"\n🔷 [第 {self.object_area_num} 次抓取]：{self.item}")
-            for j, item in enumerate(self.item):
+            self.iteam = self.catch_items[:Number_of_grips]
+            del self.catch_items[:Number_of_grips]
+            print(f"\n🔷 [第 {self.i+1} 次抓取]：{self.iteam}")
+            for j, item in enumerate(self.iteam):
                 row = self.order_map[item]
                 col = self.count_map[item]
 
@@ -243,9 +248,9 @@ class ExampleStrategy(Node):
                 x,y,z,rx,ry,rz = Sorting_area_base[row][col]
 
                 if j == 0:
-                    x -= 75.0
-                elif j == 2:
-                    x += 75.0
+                    x -= Offset
+                elif j == 1:
+                    x += Offset
 
 
                 self.count_map[item] += 1
@@ -264,6 +269,7 @@ class ExampleStrategy(Node):
             print("Sort object:",self.catch_num+1)
 
         elif state == States.SORT_PLACE_DOWN:
+            self.get_logger().info('down')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -288,6 +294,7 @@ class ExampleStrategy(Node):
             nest_state = States.SORT_PLACE_UP
 
         elif state == States.SORT_PLACE_UP:
+            self.get_logger().info('up')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -298,19 +305,21 @@ class ExampleStrategy(Node):
                 )
             self.catch_num+=1
             print("Sort object up:",self.catch_num+1)  
-            if self.catch_num < 3:
+            if self.catch_num < Number_of_grips:
                 
                 nest_state = States.SORT_PLACE
             else:
-                if  self.object_area_num < 4:
+                if  order_area_num < 5:
                     self.Sorting_palce_DOWN =[]
                     self.Sorting_palce = []
                     self.catch_num = 0
+                    self.i +=1
                     nest_state = States.OBJECT_AREA
 
                 else:
                     nest_state = States.TT
                     self.get_logger().info('All objects sorted')
+                    self.catch_num = 0
 
 
         elif state == States.TT:
@@ -327,11 +336,7 @@ class ExampleStrategy(Node):
                             tt.append('C')
                         elif i == 3:
                             tt.append('D')
-                        elif i == 4:
-                            tt.append('E')
-                        elif i == 5:
-                            tt.append('F')
-                        if (col_counter)%3 == 0:
+                        if (col_counter)%Number_of_grips == 0:
                             self.oder_items.append(tt)    
                             tt = []
                             col_counter = 1
@@ -362,6 +367,7 @@ class ExampleStrategy(Node):
                 elif j == 2:
                     x += 75.0
                     print("🔁 第三個物體：夾具偏移 (x + 50)")
+                self.matrix_order[row][col] = item
                 self.sort_count_map[item] += 1
                 self.Order_palce.append([x,y,z,rx,ry,rz])
                 self.Order_palce_DOWN.append([x,y,z-50,rx,ry,rz])
@@ -485,7 +491,7 @@ class ExampleStrategy(Node):
                 )
             self.order_palce_num+=1
             print("Sort object up:",self.order_palce_num+1)  
-            if not len(self.oder_items[0])==0:
+            if not len(self.oder_items  [0])==0:
                 print("next order")
                 self.order_palce_DOWN =[]
                 self.order_palce = []
@@ -493,20 +499,13 @@ class ExampleStrategy(Node):
                 nest_state = States.SORT_ORDER
 
             else:
-                nest_state = States.END_HOME
+                nest_state = States.CLOSE_ROBOT
                 self.get_logger().info('All objects sorted, closing robot')
                 print("All objects sorted, closing robot")
+                self.num = 0
 
-        elif state == States.END_HOME:
-            self.get_logger().info('HOME_MOVE !!!!!')
-            res = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.PTP,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=HOME_POSE,
-                holding=True
-                )
-            nest_state = States.CLOSE_ROBOT
         
+
 
         elif state == States.CLOSE_ROBOT:
             self.get_logger().info('CLOSE_ROBOT')
@@ -544,8 +543,6 @@ class ExampleStrategy(Node):
             if state == None:
                 break
         self.destroy_node()
-        rclpy.shutdown()
-
     def _wait_for_future_done(self, future: Future, timeout=-1):
         time_start = time.time()
         while not future.done():
