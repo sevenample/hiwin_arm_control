@@ -18,9 +18,8 @@ setup(
     license='MIT-0',
     entry_points={
         'console_scripts': [
-            'hshs_gui = gui_interface.hshs_gui:main',
+            'gui = gui_interface.gui:main',
             'order_listener = gui_interface.order_listener:main',
-            'h_gui = gui_interface.haha2:main',
         ],
     },
 )
