@@ -74,22 +74,25 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
 
     def submit_orders(self):
         result = ""
-        matrix = [[], []]  # 2 x n 陣列
+        matrix = []  # 2 x n 陣列
         for idx, order in enumerate(self.orders):
+            col = 1
             result += f"🧾 訂單 {idx+1}:\n"
             row = []
             for zone, cb in order.items():
                 item = cb.currentData()
                 row.append(item)
                 result += f"  區域 {zone}: {cb.currentText()}\n"
-            if idx < 2:
-                matrix[idx] = row
-            else:
-                matrix.append(row)  # 允許超過兩行時擴展
+                if col ==2 :
+                    matrix.append(row)
+                    row = []
+                    col = 1
+                else:
+                    col +=1 
+            row.append('NONE')
+            matrix.append(row)
             result += "\n"
-
         self.result_panel.setText(result)
-
         # 發送 matrix 給 ROS2
         self.ros_node.publish_matrix(matrix)
 
