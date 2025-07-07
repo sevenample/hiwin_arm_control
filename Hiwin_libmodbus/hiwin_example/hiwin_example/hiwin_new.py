@@ -40,7 +40,7 @@ Sorting_area_base = [
     ([0.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-75.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-225.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # C row
     ([0.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-75.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-225.0, 566.0, 235.0, -180.0, 0.00, 90.00])   # D row
 ]
-
+SORT_BASE_POSE = []
 OBJECT_POSES = [
     ([-346.0, 229.0, 290.0, -180.00, 0.00, 90.00]),
     ([-346.0, 309.0, 290.0, -180.00, 0.00, 90.00]),
@@ -138,10 +138,11 @@ class ExampleStrategy(Node):
         self.catch_count=msg.items
         print("Catch received:", self.catch_count)
 
-    def down_pose(self,pose):
-        pose[2] -=  Down_Offset
-        return pose 
-    
+    def down_pose(self, pose):
+        new_pose = pose.copy()  # ← 建立一份新 list
+        new_pose[2] -= 50
+        return new_pose
+
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
             self.get_logger().info('INIT')
@@ -226,6 +227,12 @@ class ExampleStrategy(Node):
             nest_state = States.SORT_AREA
 
         elif state == States.SORT_AREA:
+            res1 = self.motion_request_send(
+                cmd_mode=Motioncmd.Request.PTP,
+                cmd_type=Motioncmd.Request.POSE_CMD,
+                pose=SORT_BASE_POSE,
+                holding=True
+                )
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -310,6 +317,12 @@ class ExampleStrategy(Node):
             nest_state = States.ORDER_OBJECT_AREA
 
         elif state == States.ORDER_OBJECT_AREA:
+            res1 = self.motion_request_send(
+                cmd_mode=Motioncmd.Request.PTP,
+                cmd_type=Motioncmd.Request.POSE_CMD,
+                pose=SORT_BASE_POSE,
+                holding=True
+                )
             # self.get_logger().info('Move to object of order')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
