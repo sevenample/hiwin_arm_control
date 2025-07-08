@@ -7,6 +7,7 @@ from rclpy.node import Node
 from rclpy.task import Future
 from typing import NamedTuple
 from hiwin_msgs.msg import OrderArray, CatchArray
+from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from hiwin_interfaces.srv import Motioncmd
 from hiwin_interfaces.srv import Digitalcmd
@@ -19,35 +20,42 @@ import random
 import time
 # from YoloDetector import YoloDetectorActionClient
 
-DEFAULT_VELOCITY = 20
-DEFAULT_ACCELERATION = 20
-LINE_VELOCITY = 80
-LINE_ACCELERATION = 80
-VACUUM1_PIN = 3
-VACUUM2_PIN = 4
+DEFAULT_VELOCITY = 50
+DEFAULT_ACCELERATION = 50
+LINE_VELOCITY = 100
+LINE_ACCELERATION = 100
+
 
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
 # 抓取物件數
 Number_of_grips = 2
 # 左右偏移量
-Offset = 30.0
+Offset = 35.0
 # 下降偏移量
-Down_Offset = 50.0
-
+Down_Offset = [21.0,-31.0,-96.0]
+# 21 -31 -96
 Sorting_area_base = [
-    ([300.0, 427.0, 185.0, -180.0, 0.00, 90.00], [225.0, 427.0, 185.0, -180.0, 0.00, 90.00],[150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[75.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # A row
-    ([300.0, 566.0, 235.0, -180.0, 0.00, 90.00],[225.0, 566.0, 235.0, -180.0, 0.00, 90.00],[150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[75.0, 566.0, 235.0, -180.0, 0.00, 90.00]), # B row
-    ([0.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-75.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-150.0, 427.0, 185.0, -180.0, 0.00, 90.00],[-225.0, 427.0, 185.0, -180.0, 0.00, 90.00]),  # C row
-    ([0.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-75.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-150.0, 566.0, 235.0, -180.0, 0.00, 90.00],[-225.0, 566.0, 235.0, -180.0, 0.00, 90.00])   # D row
-]
-SORT_BASE_POSE = []
-OBJECT_POSES = [
-    ([-346.0, 229.0, 290.0, -180.00, 0.00, 90.00]),
-    ([-346.0, 309.0, 290.0, -180.00, 0.00, 90.00]),
-    ([-346.0, 368.0, 290.0, -180.00, 0.00, 90.00]),
-    ([-346.0, 229.0, 290.0, -180.00, 0.00, 90.00]),
+    ([311.0, 543.0,  82.0, -180.0, 0.00, 90.00],[241.0, 543.0,  82.0, -180.0, 0.00, 90.00],[171.0,  543.0,  82.0, -180.0, 0.00, 90.00]),  # A row
+    ([311.0, 402.0,  82.0, -180.0, 0.00, 90.00],[241.0, 402.0,  82.0, -180.0, 0.00, 90.00],[171.0,  402.0,  82.0, -180.0, 0.00, 90.00]), # B row
+    ([311.0, 328.0,  82.0, -180.0, 0.00, 90.00],[241.0, 328.0,  82.0, -180.0, 0.00, 90.00],[171.0,  328.0,  82.0, -180.0, 0.00, 90.00]),  # C row
+    ([31.0,  543.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 543.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 543.0,  82.0, -180.0, 0.00, 90.00]),   # D row
+    ([31.0,  402.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 402.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 402.0,  82.0, -180.0, 0.00, 90.00]),   # E row
+    ([31.0,  328.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 328.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 328.0,  82.0, -180.0, 0.00, 90.00]),   # F row
 ]
 
+OBJECT_POSES = [    
+    ([-222.0, 210.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-222.0, 311.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-222.0, 400.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 210.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 311.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 400.0, 82.0, -180.00, 0.00, 90.00]),
+
+
+    ([-517.0, 255.0, 82.0, -180.00, 0.00, 180.00]),
+    ([-517.0, 354.0, 82.0, -180.00, 0.00, 180.00]),
+]
+SAVE_POSE = [69.0, 330.0, 90.0, -180.0, 0.0, 90.0],[335.0,338.0,107.0,-180.0,0.0,90.0]
 ORDER_POSES = [
     ([346.0, 229.0, 290.0, -180.00, 0.00, 90.00]),
     ([346.0, 309.0, 290.0, -180.00, 0.00, 90.00]),
@@ -67,19 +75,12 @@ class States(Enum):
     SORT_AREA = 7
     SORT_PLACE = 8
     
-
     READ_ORDER = 9
     ORDER_OBJECT_AREA =10
     ORDER_OBJECT_PICK = 11
     ORDER_AREA = 12
     ORDER_PLACE = 13
-    
     END_HOME_MOVE = 14
-
-
-
-
-
 
 class ExampleStrategy(Node):
 
@@ -92,8 +93,9 @@ class ExampleStrategy(Node):
         self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
         self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5}
 
-        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3
+        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3
         random.shuffle(self.catch_items)
+        del self.catch_items[15:]
 
         self.order_area_num = 0
         self.item = []
@@ -111,7 +113,7 @@ class ExampleStrategy(Node):
         self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
         # 訂閱 OrderArray 類型的訊息
         self.order_subscription = self.create_subscription(
-            OrderArray,
+            String,
             'order_list',
             self.order_callback,
             10)
@@ -128,20 +130,24 @@ class ExampleStrategy(Node):
         self.catch_count = []
 
     def order_callback(self, msg):
-        items = []
-        for count in msg.quantities:
-            items.append(count)
-        self.order_count.append(items)
+        self.order_count = msg.data
+
         print("Order received:", self.order_count)
 
     def catch_callback(self, msg):
         self.catch_count=msg.items
         print("Catch received:", self.catch_count)
 
-    def down_pose(self, pose):
+    def down_pose(self, pose,state):
         new_pose = pose.copy()  # ← 建立一份新 list
-        new_pose[2] -= 50
+        if state in ('Z', 'C', 'F'):
+            new_pose[2] = Down_Offset[2]
+        elif state in('B' ,'E'):
+            new_pose[2] = Down_Offset[1]
+        elif state in('A','D'):
+            new_pose[2] = Down_Offset[0]
         return new_pose
+
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
@@ -156,7 +162,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=HOME_POSE,
-                holding=True
+                holding=False
                 )
             nest_state = States.OBJECT_AREA
 
@@ -165,8 +171,8 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.order_area_num][1],
-                holding=True
+                pose=OBJECT_POSES[self.order_area_num],
+                holding=False
                 )
             nest_state = States.CATCH_OBJECT
             print("夾取第",self.order_area_num+1,"次來料區")
@@ -176,25 +182,32 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(OBJECT_POSES[self.order_area_num]),
+                pose=self.down_pose(OBJECT_POSES[self.order_area_num],'Z'),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
-            for i in range(Number_of_grips):
-                res1 = self.digital_request_send(
-                    cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
-                    # digital_input_pin=1,
-                    digital_output_pin=i+1,
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
-                    time_wait=2,
-                    holding=False
-                    )
+            res1 = self.digital_request_send(
+                cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                # digital_input_pin=1,
+                digital_output_pin=1,
+                digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                time_wait=0,
+                holding=False
+                )
+            res4 = self.digital_request_send(
+                cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                # digital_input_pin=1,
+                digital_output_pin=2,
+                digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                time_wait=0,
+                holding=False
+                )
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=OBJECT_POSES[self.order_area_num],
-                holding=True,
+                holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
             print("夾取",self.order_area_num)
@@ -227,26 +240,22 @@ class ExampleStrategy(Node):
             nest_state = States.SORT_AREA
 
         elif state == States.SORT_AREA:
-            res1 = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.PTP,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=SORT_BASE_POSE,
-                holding=True
-                )
+
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=self.Sorting_palce[self.catch_num],
-                holding=True
+                holding=False
                 )
             nest_state = States.SORT_PLACE
             print("準備放置物品",self.catch_num+1)
 
         elif state == States.SORT_PLACE:
+            print(self.item [self.catch_num])
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(self.Sorting_palce[self.catch_num]),
+                pose=self.down_pose(self.Sorting_palce[self.catch_num],self.item [self.catch_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -263,22 +272,28 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=self.Sorting_palce[self.catch_num],
-                holding=True,
+                holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
             self.catch_num+=1
-            print("放置物品",self.catch_num+1,"完成")  
+            print("放置物品",self.catch_num,"完成")  
             if self.catch_num < Number_of_grips:
                 self.order_area_num += 1
                 nest_state = States.SORT_AREA
             else:
-                if  self.order_area_num < 5:
+                if  self.order_area_num < 8:
                     self.Sorting_palce = []
                     self.catch_num = 0
                     nest_state = States.OBJECT_AREA
 
                 else:
+                    res = self.motion_request_send(
+                        cmd_mode=Motioncmd.Request.PTP,
+                        cmd_type=Motioncmd.Request.POSE_CMD,
+                        pose=HOME_POSE,
+                        holding=False
+                        )
                     nest_state = States.READ_ORDER
                     self.get_logger().info('分檢完成')
                     self.catch_num = 0
@@ -320,7 +335,7 @@ class ExampleStrategy(Node):
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=SORT_BASE_POSE,
+                pose=SAVE_POSE[1],
                 holding=True
                 )
             # self.get_logger().info('Move to object of order')
@@ -339,7 +354,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(self.Order_palce[0]),
+                pose=self.down_pose(self.Order_palce[0],self.oder_item(self.order_catch_palce_num)),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION

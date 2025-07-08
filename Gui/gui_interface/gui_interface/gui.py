@@ -8,7 +8,7 @@ import json  # 用來傳送陣列
 class OrderPublisher(Node):
     def __init__(self):
         super().__init__('order_publisher')
-        self.publisher_ = self.create_publisher(String, 'order_matrix', 10)
+        self.publisher_ = self.create_publisher(String, 'order_list', 10)
 
     def publish_matrix(self, matrix):
         msg = String()
@@ -29,7 +29,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
 
         # 左側圖片
         self.tray_widget = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap("/home/sevenample/ros2_ws/src/Gui/gui_interface/gui_interface/pan.jpg")
+        pixmap = QtGui.QPixmap("pan.jpg")
         scaled_pixmap = pixmap.scaled(400, 400, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.tray_widget.setPixmap(scaled_pixmap)
         layout.addWidget(self.tray_widget)
