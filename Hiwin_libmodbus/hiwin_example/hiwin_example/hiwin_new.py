@@ -32,28 +32,28 @@ Number_of_grips = 2
 # 左右偏移量
 Offset = 35.0
 # 下降偏移量
-Down_Offset = [21.0,-31.0,-96.0]
+Down_Offset = [140.0,81.0,21.0]
 # 21 -31 -96
 Sorting_area_base = [
-    ([311.0, 543.0,  82.0, -180.0, 0.00, 90.00],[241.0, 543.0,  82.0, -180.0, 0.00, 90.00],[171.0,  543.0,  82.0, -180.0, 0.00, 90.00]),  # A row
-    ([311.0, 402.0,  82.0, -180.0, 0.00, 90.00],[241.0, 402.0,  82.0, -180.0, 0.00, 90.00],[171.0,  402.0,  82.0, -180.0, 0.00, 90.00]), # B row
-    ([311.0, 328.0,  82.0, -180.0, 0.00, 90.00],[241.0, 328.0,  82.0, -180.0, 0.00, 90.00],[171.0,  328.0,  82.0, -180.0, 0.00, 90.00]),  # C row
-    ([31.0,  543.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 543.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 543.0,  82.0, -180.0, 0.00, 90.00]),   # D row
-    ([31.0,  402.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 402.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 402.0,  82.0, -180.0, 0.00, 90.00]),   # E row
-    ([31.0,  328.0,  82.0, -180.0, 0.00, 90.00],[-39.0, 328.0,  82.0, -180.0, 0.00, 90.00],[-109.0, 328.0,  82.0, -180.0, 0.00, 90.00]),   # F row
+    ([311.0, 463.0,  210.0, -180.0, 0.00, 90.00],[241.0, 463.0,  210.0, -180.0, 0.00, 90.00],[171.0,  463.0,  210.0, -180.0, 0.00, 90.00]),  # A row
+    ([311.0, 367.0,  210.0, -180.0, 0.00, 90.00],[241.0, 367.0,  210.0, -180.0, 0.00, 90.00],[171.0,  367.0,  210.0, -180.0, 0.00, 90.00]), # B row
+    ([311.0, 277.0,  210.0, -180.0, 0.00, 90.00],[241.0, 277.0,  210.0, -180.0, 0.00, 90.00],[171.0,  277.0,  210.0, -180.0, 0.00, 90.00]),  # C row
+    ([31.0,  463.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 463.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 463.0,  210.0, -180.0, 0.00, 90.00]),   # D row
+    ([31.0,  367.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 367.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 367.0,  210.0, -180.0, 0.00, 90.00]),   # E row
+    ([31.0,  277.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 277.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 277.0,  210.0, -180.0, 0.00, 90.00]),   # F row
 ]
 
 OBJECT_POSES = [    
-    ([-222.0, 210.0, 82.0, -180.00, 0.00, 90.00]),
-    ([-222.0, 311.0, 82.0, -180.00, 0.00, 90.00]),
-    ([-222.0, 400.0, 82.0, -180.00, 0.00, 90.00]),
-    ([-389.0, 210.0, 82.0, -180.00, 0.00, 90.00]),
-    ([-389.0, 311.0, 82.0, -180.00, 0.00, 90.00]),
-    ([-389.0, 400.0, 82.0, -180.00, 0.00, 90.00]),
+    ([-222.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-222.0, 285.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-222.0, 385.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 285.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-389.0, 385.0, 210.0, -180.00, 0.00, 90.00]),
 
 
-    ([-517.0, 255.0, 82.0, -180.00, 0.00, 180.00]),
-    ([-517.0, 354.0, 82.0, -180.00, 0.00, 180.00]),
+    ([-517.0, 255.0, 210.0, -180.00, 0.00, 180.00]),
+    ([-517.0, 354.0, 210.0, -180.00, 0.00, 180.00]),
 ]
 SAVE_POSE = [69.0, 330.0, 90.0, -180.0, 0.0, 90.0],[335.0,338.0,107.0,-180.0,0.0,90.0]
 ORDER_POSES = [
@@ -93,7 +93,7 @@ class ExampleStrategy(Node):
         self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
         self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5}
 
-        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3
+        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 
         random.shuffle(self.catch_items)
         del self.catch_items[15:]
 
@@ -113,7 +113,7 @@ class ExampleStrategy(Node):
         self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
         # 訂閱 OrderArray 類型的訊息
         self.order_subscription = self.create_subscription(
-            String,
+            OrderArray,
             'order_list',
             self.order_callback,
             10)
@@ -126,20 +126,23 @@ class ExampleStrategy(Node):
             10)
         
         # 初始化統計數據
-        self.order_count = []
         self.catch_count = []
 
     def order_callback(self, msg):
-        self.order_count = msg.data
+        flat_data = msg.item_names
+        self.oder_items = [flat_data[i:i+2] for i in range(0, len(flat_data), 2)]
 
-        print("Order received:", self.order_count)
+        print("Order received:", self.oder_items)
 
     def catch_callback(self, msg):
         self.catch_count=msg.items
         print("Catch received:", self.catch_count)
+
+
     def same_thing (self,pose):
-        if pose[0] == pose[1]:
-            del pose[0]
+        if len(pose) >1:
+            if pose[0] == pose[1]:
+                del pose[0]
         else :
             return
 
@@ -180,7 +183,7 @@ class ExampleStrategy(Node):
                 holding=False
                 )
             nest_state = States.CATCH_OBJECT
-            print("夾取第",self.order_area_num+1,"次來料區")
+            print("\n夾取第",self.order_area_num+1,"次來料區\n")
         
 
         elif state == States.CATCH_OBJECT:
@@ -215,7 +218,6 @@ class ExampleStrategy(Node):
                 holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
-            print("夾取",self.order_area_num)
             nest_state = States.READ_OBJECT
 
         elif state == States.READ_OBJECT:
@@ -242,6 +244,8 @@ class ExampleStrategy(Node):
                 self.count_map[item] += 1
                 self.Sorting_palce.append([x,y,z,rx,ry,rz])
             self.same_thing (self.Sorting_palce)
+            self.order_area_num += 1
+
             nest_state = States.SORT_AREA
 
         elif state == States.SORT_AREA:
@@ -284,8 +288,8 @@ class ExampleStrategy(Node):
             self.catch_num+=1
             print("放置物品",self.catch_num,"完成")  
             del self.Sorting_palce[0]
-            if not len(self.Sorting_palce  [0])==0:
-                self.order_area_num += 1
+            if self.Sorting_palce:
+                print('next')
                 nest_state = States.SORT_AREA
             else:
                 if  self.order_area_num < 8:
@@ -311,9 +315,8 @@ class ExampleStrategy(Node):
             print("進行訂單",self.oder_items)
             self.oder_item = self.oder_items[0]
             del self.oder_items[0]
-            self.same_thing (self.oder_item)
             for j, item in enumerate(self.oder_item):
-                if (self.oder_item[j]==0):
+                if (self.oder_item[j] == 'NONE'):
                     print("")
                 else:
                     row = self.order_map[item]
@@ -334,12 +337,6 @@ class ExampleStrategy(Node):
             nest_state = States.ORDER_OBJECT_AREA
 
         elif state == States.ORDER_OBJECT_AREA:
-            res1 = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.PTP,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=SAVE_POSE[1],
-                holding=True
-                )
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -354,7 +351,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(self.Order_palce[0],self.oder_item(self.order_catch_palce_num)),
+                pose=self.down_pose(self.Order_palce[0],self.oder_item [self.order_catch_palce_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -378,7 +375,7 @@ class ExampleStrategy(Node):
             print("抓取",self.order_catch_palce_num+1,"完畢")
             self.order_catch_palce_num += 1
             del self.Order_palce[0]
-            if not len(self.Order_palce  [0])==0:
+            if self.Order_palce:
                 nest_state = States.ORDER_OBJECT_AREA
             else:
                 nest_state = States.ORDER_AREA
@@ -398,7 +395,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(ORDER_POSES[self.order_palce_num]),
+                pose=self.down_pose(ORDER_POSES[self.order_palce_num],'Z'),
                 holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -423,7 +420,7 @@ class ExampleStrategy(Node):
             self.order_palce_num+=1
             print("完成",self.order_palce_num+1)  
 
-            if not len(self.oder_items  [0])==0:
+            if self.oder_items :
                 print("next order")
                 self.order_palce = []
                 self.order_catch_palce_num= 0

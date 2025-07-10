@@ -3,18 +3,20 @@ import sys
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from hiwin_msgs.msg import OrderArray
 import json  # 用來傳送陣列
 
 class OrderPublisher(Node):
     def __init__(self):
         super().__init__('order_publisher')
-        self.publisher_ = self.create_publisher(String, 'order_list', 10)
+        self.publisher_ = self.create_publisher(OrderArray, 'order_list', 10)
 
     def publish_matrix(self, matrix):
-        msg = String()
-        msg.data = json.dumps(matrix)  # 轉成字串發送
+        flat_data = [item for pair in matrix for item in pair]
+        msg = OrderArray()
+        msg.item_names = flat_data  # 轉成字串發送
         self.publisher_.publish(msg)
-        self.get_logger().info(f'✅ 已發送訂單陣列：{msg.data}')
+        self.get_logger().info(f'{msg.item_names}')
 
 
 class MultiOrderTrayWindow(QtWidgets.QWidget):
@@ -27,25 +29,36 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         self.setLayout(layout)
 
-        # 左側圖片
+        left_layout = QtWidgets.QVBoxLayout()
+        layout.addLayout(left_layout)
+
+        # 📦 統計區放左上角
+        self.summary_panel = QtWidgets.QTextEdit()
+        self.summary_panel.setReadOnly(True)
+        self.summary_panel.setPlaceholderText("📦 即時物件數量統計")
+        self.summary_panel.setMaximumHeight(150)  # 可以視需求調整
+        left_layout.addWidget(self.summary_panel)
+
+        # 圖片放左下角
         self.tray_widget = QtWidgets.QLabel()
         pixmap = QtGui.QPixmap("pan.jpg")
         scaled_pixmap = pixmap.scaled(400, 400, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.tray_widget.setPixmap(scaled_pixmap)
-        layout.addWidget(self.tray_widget)
+        left_layout.addWidget(self.tray_widget)
+
 
         # 右側訂單
         right_layout = QtWidgets.QVBoxLayout()
         self.orders = []
-        zones = ["A", "B", "C", "D", "E"]
+        zones = ['A', 'B', 'C', 'D', 'E']
         items = [
-            ("NONE", "無"),
-            ("A", "大立方體"),
-            ("B", "中立方體"),
-            ("C", "小立方體"),
-            ("D", "圓柱"),
-            ("E", "三角柱"),
-            ("F", "六角柱")
+            ('NONE', '無'),
+            ('A', '大立方體'),
+            ('B', '中立方體'),
+            ('C', '小立方體'),
+            ('D', '圓柱'),
+            ('E', '三角柱'),
+            ('F', '六角柱')
         ]
 
         for i in range(3):
@@ -56,6 +69,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
                 combo_box = QtWidgets.QComboBox()
                 for code, name in items:
                     combo_box.addItem(f"{code} - {name}", code)
+                combo_box.currentIndexChanged.connect(self.update_summary)  # 每次改變都更新統計
                 form_layout.addRow(f"區域 {zone}", combo_box)
                 order_inputs[zone] = combo_box
             group_box.setLayout(form_layout)
@@ -71,6 +85,21 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         right_layout.addWidget(self.result_panel)
 
         layout.addLayout(right_layout)
+
+
+    def update_summary(self):
+        item_counter = {}
+
+        for order in self.orders:
+            for cb in order.values():
+                item = cb.currentData()
+                if item != 'NONE':
+                    item_counter[item] = item_counter.get(item, 0) + 1
+
+        summary = "📦 即時物件數量統計：\n"
+        for item_code, count in item_counter.items():
+            summary += f"  {item_code}：{count} 個\n"
+        self.summary_panel.setText(summary)
 
     def submit_orders(self):
         result = ""

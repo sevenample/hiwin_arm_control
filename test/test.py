@@ -1,3 +1,3 @@
-SAVE_POSE = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-del SAVE_POSE[13:]
-print(SAVE_POSE)
+SAVE_POSE = [[]]
+if SAVE_POSE[0]:
+    print(type(SAVE_POSE))
