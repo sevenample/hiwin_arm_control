@@ -41,6 +41,8 @@ Sorting_area_base = [
     ([31.0,  463.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 463.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 463.0,  210.0, -180.0, 0.00, 90.00]),   # D row
     ([31.0,  367.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 367.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 367.0,  210.0, -180.0, 0.00, 90.00]),   # E row
     ([31.0,  277.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 277.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 277.0,  210.0, -180.0, 0.00, 90.00]),   # F row
+    ([311.0, 177.0,  210.0, -180.0, 0.00, 90.00],[241.0, 177.0,  210.0, -180.0, 0.00, 90.00],[171.0,  177.0,  210.0, -180.0, 0.00, 90.00]),  # C row
+
 ]
 
 OBJECT_POSES = [    
@@ -55,7 +57,7 @@ OBJECT_POSES = [
     ([-517.0, 255.0, 210.0, -180.00, 0.00, 180.00]),
     ([-517.0, 354.0, 210.0, -180.00, 0.00, 180.00]),
 ]
-SAVE_POSE = [69.0, 330.0, 90.0, -180.0, 0.0, 90.0],[335.0,338.0,107.0,-180.0,0.0,90.0]
+
 ORDER_POSES = [
     ([346.0, 229.0, 290.0, -180.00, 0.00, 90.00]),
     ([346.0, 309.0, 290.0, -180.00, 0.00, 90.00]),
@@ -90,8 +92,8 @@ class ExampleStrategy(Node):
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
         
-        self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
-        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5}
+        self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0,'G':0}
+        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5, 'G':6}
 
         self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 
         random.shuffle(self.catch_items)
@@ -110,7 +112,7 @@ class ExampleStrategy(Node):
         self.order_catch_palce_num = 0
         self.order_palce_num = 0
 
-        self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0}
+        self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0, 'G':0}
         # 訂閱 OrderArray 類型的訊息
         self.order_subscription = self.create_subscription(
             OrderArray,
@@ -148,7 +150,7 @@ class ExampleStrategy(Node):
 
     def down_pose(self, pose,state):
         new_pose = pose.copy()  # ← 建立一份新 list
-        if state in ('Z', 'C', 'F'):
+        if state in ('Z', 'C', 'F', 'G'):
             new_pose[2] = Down_Offset[2]
         elif state in('B' ,'E'):
             new_pose[2] = Down_Offset[1]
@@ -228,9 +230,6 @@ class ExampleStrategy(Node):
             for j, item in enumerate(self.item):
                 row = self.order_map[item]
                 col = self.count_map[item]
-
-                if col >= 3:
-                    raise ValueError(f"{item} 類物體已放滿！")
 
                 # 計算位置（加上列的基礎座標 + 欄位間隔）
                 x,y,z,rx,ry,rz = Sorting_area_base[row][col]
@@ -315,8 +314,15 @@ class ExampleStrategy(Node):
             print("進行訂單",self.oder_items)
             self.oder_item = self.oder_items[0]
             del self.oder_items[0]
+            if self.oder_item == ['NONE', 'NONE']:
+                self.order_palce_num += 1
+                print("沒有訂單，跳過")
+                nest_state = States.READ_ORDER
+
             for j, item in enumerate(self.oder_item):
                 if (self.oder_item[j] == 'NONE'):
+                    if j == 0:
+                        self.order_catch_palce_num+=1
                     print("")
                 else:
                     row = self.order_map[item]
