@@ -1,77 +1,85 @@
 import rclpy
 from rclpy.node import Node
-from hiwin_msgs.msg import OrderArray, CatchArray
 import serial
+from hiwin_msgs.msg import CatchArray  # 根據實際套件名稱調整
 
-class TCRT5000SerialPublisher(Node):
+class ShapeClassifier(Node):
     def __init__(self):
-        super().__init__('tcrt5000_serial_publisher')
-        self.publisher_ = self.create_publisher(CatchArray, 'catch_list', 10)
+        super().__init__('shape_classifier')
+        self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+        self.publisher_ = self.create_publisher(CatchArray, 'detected_shapes', 10)
+        self.timer = self.create_timer(0.1, self.read_serial_data)
 
-        # 初始化 Serial 連接
-        self.ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)  # 請根據實際調整埠號
-        self.get_logger().info('🔌 Serial 連接成功，開始接收資料')
-        self.same_count = 0
-        self.prev_labels = ['無', '無', '無']
-        self.same_counts = [0, 0, 0]
-        self.detected_objects = ['無', '無', '無']  # 確認後的結果
-        self.prev_detected_objects = [None, None, None]  # 上次偵測到的物體
+        self.shape_map = {
+            '大立方體': 'A',
+            '中立方體': 'B',
+            '小立方體': 'C',
+            '圓柱': 'D',
+            '三角柱': 'E',
+            '六角柱': 'F',
+            '無法分類': 'NONE'
+        }
 
-        # 定時讀取 Serial
-        self.timer = self.create_timer(0.2, self.timer_callback)
-    def timer_callback(self):
+    def read_serial_data(self):
+        if self.ser.in_waiting > 0:
+            line = self.ser.readline().decode('utf-8').strip()
+            try:
+                adc_str, b1, b2, b3, b4 = line.split(',')
+                adc = int(adc_str)
+                b1 = int(b1)
+                b2 = int(b2)
+                b3 = int(b3)
+                b4 = int(b4)
 
-        line = self.ser.readline().decode('utf-8', errors='ignore').strip()
-        data_list = [int(x.strip()) for x in line.strip().split('哈')]
-        # print(data_list)
-        data_matrix = [data_list[i*5:(i+1)*5] for i in range(3)]
-        labels = [self.detect_shape(row) for row in data_matrix]
-        for i in range(3):
-            if labels[i] == self.prev_labels[i]:
-                self.same_counts[i] += 1
+                shape_name = self.classify(adc, b1, b2, b3, b4)
+                shape_code = self.shape_map.get(shape_name, 'NONE')
+
+                msg = CatchArray()
+                msg.items = [shape_code]  # 發送代碼
+                self.publisher_.publish(msg)
+                self.get_logger().info(f"辨識為: {shape_name} -> {shape_code} (ADC: {adc})")
+            except Exception as e:
+                self.get_logger().warn(f"解析錯誤: {e} -> '{line}'")
+
+    def classify(self, sensorValue, b1, b2, b3, b4):
+        if sensorValue >= 1000:
+            if b1 == 0:
+                return "大立方體"
+            elif b2 == 0:
+                return "大長方體"  # 不在對照表內，將視為 NONE
             else:
-                self.same_counts[i] = 1
-                self.prev_labels[i] = labels[i]
-            if self.same_counts[i] == 5:
-                self.same_counts[i] = 0  # 重置計數
-                self.detected_objects[i] = str(labels[i])
-                print(f"✅ 位置更新: {i+1}")
-
-        
-        if self.detected_objects == self.prev_detected_objects:
-            print("🔄 偵測結果未變化，跳過發布")
-        else:
-            print("📦 偵測結果已變化，發布新消息")
-            print(f"偵測到的物體: {self.detected_objects}")
-            self.prev_detected_objects = self.detected_objects.copy()
-            msg = CatchArray()
-            msg.items = self.detected_objects
-            self.publisher_.publish(msg)
-            
-        
-    # 偵測形狀邏輯
-    def detect_shape(self,row):
-        if all(row[i] < 500 for i in [0, 1, 2, 3, 4]):
-            return "正方體"
-        elif all(row[i] < 500 for i in [1, 2, 3]):
-            return "圓柱"
-        elif all(row[i] < 500 for i in [0, 1, 3]) or all(row[i] < 500 for i in [2, 3, 4]):
-            return "長方體"
-        elif row[2] < 500:
+                return "小長方體"  # 不在對照表內，將視為 NONE
+        elif sensorValue >= 870:
+            return "六角柱"
+        elif 720 <= sensorValue <= 820:
+            return "中立方體" if b2 == 0 else "三角柱"
+        elif 600 <= sensorValue <= 670:
+            if b1 == 0:
+                return "六角柱"
+            elif b3 == 0:
+                return "大長方體"  # 不在表內
+            else:
+                return "圓柱"
+        elif 400 <= sensorValue <= 460:
             return "三角柱"
+        elif 250 <= sensorValue <= 370:
+            return "小長方體"  # 不在表內
+        elif 70 <= sensorValue <= 125:
+            return "小立方體"
+        elif sensorValue < 30:
+            return "小長方體"  # 不在表內
         else:
-            return "無"
+            return "無法分類"
+
 def main(args=None):
     rclpy.init(args=args)
-    node = TCRT5000SerialPublisher()
+    node = ShapeClassifier()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-    finally:
-        node.ser.close()
-        node.destroy_node()
-        rclpy.shutdown()
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
