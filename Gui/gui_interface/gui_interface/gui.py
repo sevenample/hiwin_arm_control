@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from hiwin_msgs.msg import OrderArray
-import json  # 用來傳送陣列
+import json
 
 class OrderPublisher(Node):
     def __init__(self):
@@ -14,100 +14,92 @@ class OrderPublisher(Node):
     def publish_matrix(self, matrix):
         flat_data = [item for pair in matrix for item in pair]
         msg = OrderArray()
-        msg.item_names = flat_data  # 轉成字串發送
+        msg.item_names = flat_data
         self.publisher_.publish(msg)
         self.get_logger().info(f'{msg.item_names}')
 
 
 class MultiOrderTrayWindow(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, ros_node):
         super().__init__()
         self.setWindowTitle("智慧裝配 - 訂單與盤子位置輸入")
         self.setGeometry(300, 300, 1100, 700)
-        self.warnings_active = False  # 控制提交按鈕啟用
+        self.ros_node = ros_node
+        self.warnings_active = False
 
         self.setStyleSheet("""
-            QWidget {
-                font-family: -apple-system, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
-                font-size: 15px;
-                background-color: #f9f9f9;
-            }
-
-            QTextEdit {
-                border: none;
-                background: rgba(245, 245, 245, 0.9);
-                border-radius: 10px;
-                padding: 10px;
-            }
-
-            QComboBox {
-                border: 1px solid #d0d0d0;
-                border-radius: 8px;
-                padding: 6px 10px;
-                background-color: white;
-                min-width: 140px;
-                selection-background-color: #e0e0e0;
-                font-size: 15px;
-            }
-
-            QComboBox QAbstractItemView {
-                border: 1px solid #d0d0d0;
-                background-color: #f2f2f2;
-                border-radius: 10px;  /* ✅ 額外選配圓角 */
-                padding: 4px;
-                font-size: 15px;
-                selection-background-color: #ddeeff;
-                selection-color: black;
-                outline: none;
-            }
-
-            QComboBox::drop-down {
-                border: none;
-                width: 30px;
-            }
-
-            QComboBox::down-arrow {
-                image: url(:/qt-project.org/styles/commonstyle/images/arrowdown-16.png);
-                width: 12px;
-                height: 12px;
-                margin-right: 6px;
-            }
-
-            QPushButton {
-                background-color: #007AFF;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 10px 20px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #005FCC;
-            }
-            QGroupBox {
-                border: 1px solid #e0e0e0;
-                border-radius: 10px;
-                margin-top: 10px;
-                padding: 10px;
-            }
-            QGroupBox:title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
+        QWidget {
+            font-family: -apple-system, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            background-color: #f9f9f9;
+        }
+        QTextEdit {
+            border: none;
+            background: rgba(245, 245, 245, 0.9);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        QComboBox {
+            border: 1px solid #d0d0d0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            background-color: white;
+            min-width: 140px;
+            selection-background-color: #e0e0e0;
+            font-size: 15px;
+        }
+        QComboBox QAbstractItemView {
+            border: 1px solid #d0d0d0;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            padding: 4px;
+            font-size: 15px;
+            selection-background-color: #ddeeff;
+            selection-color: black;
+            outline: none;
+        }
+        QComboBox::drop-down {
+            border: none;
+            width: 30px;
+        }
+        QComboBox::down-arrow {
+            image: url(:/qt-project.org/styles/commonstyle/images/arrowdown-16.png);
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+        }
+        QPushButton {
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #005FCC;
+        }
+        QGroupBox {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        QGroupBox:title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px;
+        }
         """)
 
-
         self.setContentsMargins(20, 20, 20, 20)
-
         layout = QtWidgets.QHBoxLayout()
         layout.setSpacing(20)
         self.setLayout(layout)
 
-        # 左側佔 1/2：圖片 + 統計 + 結果
         left_layout = QtWidgets.QVBoxLayout()
         left_layout.setSpacing(15)
-        layout.addLayout(left_layout, 1)  # 1/2 寬
+        layout.addLayout(left_layout, 1)
 
         self.summary_panel = QtWidgets.QTextEdit()
         self.summary_panel.setReadOnly(True)
@@ -116,7 +108,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         left_layout.addWidget(self.summary_panel)
 
         self.tray_widget = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap("pan.jpg")  # 請改成你自己的圖檔名稱
+        pixmap = QtGui.QPixmap("pan.jpg")  # 圖片檔名請確認
         scaled_pixmap = pixmap.scaled(480, 371, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.tray_widget.setPixmap(scaled_pixmap)
         self.tray_widget.setAlignment(QtCore.Qt.AlignCenter)
@@ -129,7 +121,6 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         self.result_panel.setMinimumHeight(200)
         left_layout.addWidget(self.result_panel)
 
-        # 右側佔 1/2：訂單區 + 提交按鈕
         right_layout = QtWidgets.QVBoxLayout()
         right_layout.setSpacing(15)
         layout.addLayout(right_layout, 1)
@@ -153,7 +144,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
             for zone in zones:
                 combo_box = QtWidgets.QComboBox()
                 for code, name in items:
-                    combo_box.addItem(f"{name}", code)
+                    combo_box.addItem(f"{name}", code)  # 顯示不帶 A-
                 combo_box.currentIndexChanged.connect(self.update_summary)
                 form_layout.addRow(f"區域 {zone}", combo_box)
                 order_inputs[zone] = combo_box
@@ -195,58 +186,19 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
 
         self.summary_panel.setHtml(summary_html)
 
-        # 按鈕狀態處理
         if warnings:
             self.warnings_active = True
             self.submit_btn.setEnabled(False)
-            self.submit_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #ccc;
-                    color: #666;
-                    border-radius: 8px;
-                    padding: 10px 20px;
-                    font-weight: bold;
-                }
-            """)
+            self.submit_btn.setStyleSheet("background-color: #ccc; color: #666;")
         else:
             self.warnings_active = False
             self.submit_btn.setEnabled(True)
-            self.submit_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #007AFF;
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    padding: 10px 20px;
-                    font-weight: bold;
-                }
-                QPushButton:hover {
-                    background-color: #005FCC;
-                }
-            """)
-
-
-
-        if warnings:
-            msg = QtWidgets.QMessageBox(self)
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setWindowTitle("⚠️ 數量過多警告")
-            msg.setText("\n".join(warnings))
-            msg.setStyleSheet("""
-                QMessageBox {
-                    font-size: 18px;
-                    padding: 20px;
-                }
-                QPushButton {
-                    font-size: 16px;
-                    padding: 6px 20px;
-                }
-            """)
-            msg.exec_()
+            self.submit_btn.setStyleSheet("background-color: #007AFF; color: white;")
 
     def submit_orders(self):
         if self.warnings_active:
-            return  # 停止提交，避免執行
+            return
+
         result = ""
         matrix = []
         for idx, order in enumerate(self.orders):
@@ -268,7 +220,6 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
             result += "\n"
 
         self.result_panel.setText(result)
-        # 發送 matrix 給 ROS2
         self.ros_node.publish_matrix(matrix)
 
 
@@ -280,7 +231,6 @@ def main():
     win = MultiOrderTrayWindow(ros_node)
     win.show()
 
-    # 建立 ROS spin 執行緒
     from threading import Thread
     def ros_spin():
         rclpy.spin(ros_node)
