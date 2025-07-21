@@ -126,7 +126,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         layout.addLayout(right_layout, 1)
 
         self.orders = []
-        zones = ['A', 'B', 'C', 'D', 'E']
+        zones = ['A', 'B', 'C', 'D', 'E','F']
         items = [
             ('NONE', '無'),
             ('A', '大立方體'),
@@ -215,7 +215,6 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
                     col = 1
                 else:
                     col += 1
-            row.append('NONE')
             matrix.append(row)
             result += "\n"
 
