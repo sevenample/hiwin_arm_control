@@ -37,6 +37,10 @@ Down_Offset = [145.0,86.0,26.0,30.0]
 # Down_Offset = [140.0,81.0,21.0,25.0]
 
 # 21 -31 -96
+
+
+# IO切換
+IO = {1:1,2:2,3:5,4:4}
 Sorting_area_base = [
     ([311.0, 463.0,  210.0, -180.0, 0.00, 90.00],[241.0, 463.0,  210.0, -180.0, 0.00, 90.00],[171.0,  463.0,  210.0, -180.0, 0.00, 90.00]),  # A row
     ([311.0, 367.0,  210.0, -180.0, 0.00, 90.00],[241.0, 367.0,  210.0, -180.0, 0.00, 90.00],[171.0,  367.0,  210.0, -180.0, 0.00, 90.00]), # B row
@@ -190,7 +194,7 @@ class ExampleStrategy(Node):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1
-                    digital_output_pin=i,
+                    digital_output_pin=IO[i],
                     digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
                     time_wait=0,
                     holding=False
@@ -229,7 +233,7 @@ class ExampleStrategy(Node):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
-                    digital_output_pin=i*2,
+                    digital_output_pin=IO[i*2],
                     digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
                     time_wait=0,
                     holding=True
@@ -294,7 +298,7 @@ class ExampleStrategy(Node):
                     res2 = self.digital_request_send(
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                         # digital_input_pin=1,
-                        digital_output_pin=(i)*2,
+                        digital_output_pin=IO[i*2],
                         digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
                         time_wait=0,
                         holding=True
@@ -303,7 +307,7 @@ class ExampleStrategy(Node):
                 res2 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
-                    digital_output_pin=(self.catch_num+1)*2,
+                    digital_output_pin=IO[(self.catch_num+1)*2],
                     digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
                     time_wait=0,
                     holding=True
@@ -399,7 +403,7 @@ class ExampleStrategy(Node):
                     res1 = self.digital_request_send(
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                         # digital_input_pin=1,
-                        digital_output_pin=(i)*2,
+                        digital_output_pin=IO[i*2],
                         digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
                         time_wait=0,
                         holding=True
@@ -408,7 +412,7 @@ class ExampleStrategy(Node):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
-                    digital_output_pin=(self.order_catch_palce_num+1)*2,
+                    digital_output_pin=IO[(self.order_catch_palce_num+1)*2],
                     digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
                     time_wait=0,
                     holding=True
@@ -453,7 +457,7 @@ class ExampleStrategy(Node):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
-                    digital_output_pin=i*2,
+                    digital_output_pin=IO[i*2],
                     digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
                     time_wait=0,
                     holding=True
