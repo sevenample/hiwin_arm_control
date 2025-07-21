@@ -33,46 +33,58 @@ class ShapeClassifier(Node):
         if self.ser.in_waiting > 0:
             line = self.ser.readline().decode('utf-8').strip()
             try:
-                adc, b1, b2, b3, b4 = map(int, line.split(','))
-                code = self.classify_shape(adc, b1, b2, b3, b4)
-                label = self.code_to_chinese.get(code, '未知')
+                parts = line.split(',')
+                if len(parts) != 10:
+                    raise ValueError(f"資料長度不符: 預期10個數值，收到{len(parts)} -> '{line}'")
+
+                adc1, adc2, b1, b2, b3, b4, b5, b6, b7, b8 = map(int, parts)
+                code1 = self.classify_shape(adc1, b1, b2, b3, b4)
+                code2 = self.classify_shape(adc2, b5, b6, b7, b8)
+
+                label1 = self.code_to_chinese.get(code1, '未知')
+                label2 = self.code_to_chinese.get(code2, '未知')
 
                 msg = CatchArray()
-                msg.items = [code]
+                msg.items = [code1, code2]
                 self.publisher_.publish(msg)
 
                 # 儲存最近結果（GUI 按下按鈕時才顯示）
-                self.latest_code = code
-                self.latest_label = label
+                self.latest_code = f"{code1}, {code2}"
+                self.latest_label = f"{label1} 與 {label2}"
 
-                self.get_logger().info(f"ADC={adc}, Buttons=({b1},{b2},{b3},{b4}) -> Code: {code} ({label})")
+                self.get_logger().info(
+                    f"ADC1={adc1}, Buttons=({b1},{b2},{b3},{b4}) -> {code1} ({label1}); "
+                    f"ADC2={adc2}, Buttons=({b5},{b6},{b7},{b8}) -> {code2} ({label2})"
+                )
             except Exception as e:
                 self.get_logger().warn(f"解析錯誤: {e} -> '{line}'")
 
+
     def classify_shape(self, adc, b1, b2, b3, b4):
         if adc >= 1000:
-            return 'A' if b1 == 0 else 'G'
+            return 'A' if b1 == 0 else 'G' # 大立方體或長方體
         elif adc >= 870:
-            return 'F'
-        elif 670 <= adc <= 820:
-            return 'B' if b2 == 0 else 'E'
-        elif 480 <= adc <= 660:
-            if b4 == 0:
-                return 'G'
+            return 'F' # 六角柱
+        elif 690 <= adc <= 820:
+            return 'B' if b2 == 0 else 'E' # 中立方體或三角柱
+        elif 480 <= adc <= 680:
+            if b4 == 0 or b2 == 0:
+                return 'G' # 長方體（異常）
             elif b1 == 0 and b3 != 0:
-                return 'G'
+                return 'G' # 長方體（異常）
             elif b2 == 0 and b3 == 0:
-                return 'F'
+                return 'F' # 六角柱（躺）
             else:
-                return 'D'
+                return 'D' # 圓柱
+            
         elif 380 <= adc <= 460:
-            return 'E'
+            return 'E' # 三角柱（躺）
         elif 200 <= adc <= 370:
-            return 'G'
+            return 'G' # 長方體（異常）
         elif 35 <= adc <= 150:
-            return 'C'
+            return 'C' # 小立方體
         elif adc < 30:
-            return 'G'
+            return 'G' # 小長方體（異常）
         else:
             return 'NONE'
 
