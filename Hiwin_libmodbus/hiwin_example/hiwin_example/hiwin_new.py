@@ -45,8 +45,15 @@ IO = {1:1,
       3:5,
       4:4}
 
-IO_STATE = [Digitalcmd.Request.DIGITAL_ON,
-            Digitalcmd.Request.DIGITAL_OFF]
+
+# IO接反
+# IO = {1:2,
+#       2:1,
+#       3:4,
+#       4:5}
+
+IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
+            Digitalcmd.Request.DIGITAL_ON]
 
 
 Sorting_area_base = [
@@ -208,15 +215,15 @@ class ExampleStrategy(Node):
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1
                     digital_output_pin=IO[i*2],
-                    digital_output_cmd=IO_STATE[0],
+                    digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
                     time_wait=0,
                     holding=False
                     )
                 res2 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1
-                    digital_output_pin=IO[(i+1)*2],
-                    digital_output_cmd=IO_STATE[1],
+                    digital_output_pin=IO[i*2-1],
+                    digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
                     time_wait=0,
                     holding=False
                     )
