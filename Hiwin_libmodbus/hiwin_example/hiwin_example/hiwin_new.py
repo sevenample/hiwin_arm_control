@@ -44,6 +44,11 @@ IO = {1:1,
       2:2,
       3:5,
       4:4}
+
+IO_STATE = [Digitalcmd.Request.DIGITAL_ON,
+            Digitalcmd.Request.DIGITAL_OFF]
+
+
 Sorting_area_base = [
     ([311.0, 463.0,  210.0, -180.0, 0.00, 90.00],[241.0, 463.0,  210.0, -180.0, 0.00, 90.00],[171.0,  463.0,  210.0, -180.0, 0.00, 90.00]),  # A row
     ([311.0, 367.0,  210.0, -180.0, 0.00, 90.00],[241.0, 367.0,  210.0, -180.0, 0.00, 90.00],[171.0,  367.0,  210.0, -180.0, 0.00, 90.00]), # B row
@@ -54,6 +59,9 @@ Sorting_area_base = [
     ([-218.0,545.0, 210.0, -180.0, 0.00, -90.00],[241.0, 545.0,  210.0, -180.0, 0.00, -90.00],[171.0,  177.0,  210.0, -180.0, 0.00, -90.00]),  # G row
 
 ]
+
+# 錯誤物料區域基礎座標
+ERROR_POES = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
 
 OBJECT_POSES = [    
     ([-250.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
@@ -102,6 +110,8 @@ class States(Enum):
     ORDER_AREA = 12
     ORDER_PLACE = 13
     END_HOME_MOVE = 14
+
+    ERROR_PLACE = 15
 
 class ExampleStrategy(Node):
 
@@ -193,12 +203,20 @@ class ExampleStrategy(Node):
         elif state == States.HOME_MOVE:
             
             self.get_logger().info('HOME_MOVE !!!!!')
-            for i in range(1, 5):
+            for i in range(1, 3):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1
-                    digital_output_pin=IO[i],
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                    digital_output_pin=IO[i*2],
+                    digital_output_cmd=IO_STATE[0],
+                    time_wait=0,
+                    holding=False
+                    )
+                res2 = self.digital_request_send(
+                    cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                    # digital_input_pin=1
+                    digital_output_pin=IO[(i+1)*2],
+                    digital_output_cmd=IO_STATE[1],
                     time_wait=0,
                     holding=False
                     )
@@ -237,7 +255,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
                     digital_output_pin=IO[i*2],
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
+                    digital_output_cmd=IO_STATE[1],
                     time_wait=0,
                     holding=True
                     )
@@ -256,6 +274,8 @@ class ExampleStrategy(Node):
             del self.catch_items[:Number_of_grips]
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             for j, item in enumerate(self.item):
+                if item == 'NONE' or 'G':
+                    return
                 row = self.order_map[item]
                 col = self.count_map[item]
 
@@ -272,9 +292,54 @@ class ExampleStrategy(Node):
                 self.Sorting_palce.append([x,y,z,rx,ry,rz])
             self.same = self.same_thing (self.Sorting_palce)
             self.order_area_num += 1
-
-            nest_state = States.SORT_AREA
-
+            if self.item[0 or 1] == 'G':
+                nest_state = States.ERROR_PLACE
+            else:
+                nest_state = States.SORT_AREA
+        elif state == States.ERROR_PLACE:
+            for j, item in enumerate(self.item):
+                if item == 'G':
+                    if j == 1:
+                        i += 1
+                    print(f"\n🔴 [第 {self.order_area_num+1} 次抓取]：錯誤物料 {item}，移至錯誤物料區")
+                    res = self.motion_request_send(
+                        cmd_mode=Motioncmd.Request.PTP,
+                        cmd_type=Motioncmd.Request.POSE_CMD,
+                        pose=ERROR_POES,
+                        holding=True
+                        )
+                    res1 = self.digital_request_send(
+                        cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                        # digital_input_pin=1,
+                        digital_output_pin=IO[2],
+                        digital_output_cmd=IO_STATE[1],
+                        time_wait=0,
+                        holding=True
+                    )
+                    res2 = self.motion_request_send(
+                        cmd_mode=Motioncmd.Request.LINE,
+                        cmd_type=Motioncmd.Request.POSE_CMD,
+                        pose=self.down_pose(ERROR_POES[i],item),
+                        holding=True,
+                        velocity=LINE_VELOCITY,
+                        acceleration=LINE_ACCELERATION
+                    )
+                    res3 = self.digital_request_send(
+                        cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                        # digital_input_pin=1,
+                        digital_output_pin=IO[2],
+                        digital_output_cmd=IO_STATE[0],
+                        time_wait=0,
+                        holding=True
+                    )
+                    res4 = self.motion_request_send(
+                        cmd_mode=Motioncmd.Request.LINE,
+                        cmd_type=Motioncmd.Request.POSE_CMD,
+                        pose=ERROR_POES,
+                        holding=False,
+                        velocity=LINE_VELOCITY,
+                        acceleration=LINE_ACCELERATION
+                    )
         elif state == States.SORT_AREA:
 
             res = self.motion_request_send(
@@ -302,7 +367,7 @@ class ExampleStrategy(Node):
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                         # digital_input_pin=1,
                         digital_output_pin=IO[i*2],
-                        digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                        digital_output_cmd=IO_STATE[0],
                         time_wait=0,
                         holding=True
                     )
@@ -311,7 +376,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
                     digital_output_pin=IO[(self.catch_num+1)*2],
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                    digital_output_cmd=IO_STATE[0],
                     time_wait=0,
                     holding=True
                     )
@@ -407,7 +472,7 @@ class ExampleStrategy(Node):
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                         # digital_input_pin=1,
                         digital_output_pin=IO[i*2],
-                        digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
+                        digital_output_cmd=IO_STATE[1],
                         time_wait=0,
                         holding=True
                     )
@@ -416,7 +481,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
                     digital_output_pin=IO[(self.order_catch_palce_num+1)*2],
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
+                    digital_output_cmd=IO_STATE[1],
                     time_wait=0,
                     holding=True
                     )
@@ -461,7 +526,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                     # digital_input_pin=1,
                     digital_output_pin=IO[i*2],
-                    digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+                    digital_output_cmd=IO_STATE[0],
                     time_wait=0,
                     holding=True
                     )
@@ -505,7 +570,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                 # digital_input_pin=1,
                 digital_output_pin=20,
-                digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
+                digital_output_cmd=IO_STATE[1],
                 time_wait=0,
                 holding=True
                 )
@@ -513,7 +578,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                 # digital_input_pin=1,
                 digital_output_pin=20,
-                digital_output_cmd=Digitalcmd.Request.DIGITAL_OFF,
+                digital_output_cmd=IO_STATE[1],
                 time_wait=0,
                 holding=True
                 )
