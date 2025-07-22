@@ -281,7 +281,9 @@ class ExampleStrategy(Node):
             del self.catch_items[:Number_of_grips]
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             for j, item in enumerate(self.item):
-                if item == 'NONE' or 'G':
+                if item == 'NONE':
+                    if j == 1:
+                        self.catch_num += 1
                     return
                 row = self.order_map[item]
                 col = self.count_map[item]
@@ -299,54 +301,8 @@ class ExampleStrategy(Node):
                 self.Sorting_palce.append([x,y,z,rx,ry,rz])
             self.same = self.same_thing (self.Sorting_palce)
             self.order_area_num += 1
-            if self.item[0 or 1] == 'G':
-                nest_state = States.ERROR_PLACE
-            else:
-                nest_state = States.SORT_AREA
-        elif state == States.ERROR_PLACE:
-            for j, item in enumerate(self.item):
-                if item == 'G':
-                    if j == 1:
-                        i += 1
-                    print(f"\n🔴 [第 {self.order_area_num+1} 次抓取]：錯誤物料 {item}，移至錯誤物料區")
-                    res = self.motion_request_send(
-                        cmd_mode=Motioncmd.Request.PTP,
-                        cmd_type=Motioncmd.Request.POSE_CMD,
-                        pose=ERROR_POES,
-                        holding=True
-                        )
-                    res1 = self.digital_request_send(
-                        cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
-                        # digital_input_pin=1,
-                        digital_output_pin=IO[2],
-                        digital_output_cmd=IO_STATE[1],
-                        time_wait=0,
-                        holding=True
-                    )
-                    res2 = self.motion_request_send(
-                        cmd_mode=Motioncmd.Request.LINE,
-                        cmd_type=Motioncmd.Request.POSE_CMD,
-                        pose=self.down_pose(ERROR_POES[i],item),
-                        holding=True,
-                        velocity=LINE_VELOCITY,
-                        acceleration=LINE_ACCELERATION
-                    )
-                    res3 = self.digital_request_send(
-                        cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
-                        # digital_input_pin=1,
-                        digital_output_pin=IO[2],
-                        digital_output_cmd=IO_STATE[0],
-                        time_wait=0,
-                        holding=True
-                    )
-                    res4 = self.motion_request_send(
-                        cmd_mode=Motioncmd.Request.LINE,
-                        cmd_type=Motioncmd.Request.POSE_CMD,
-                        pose=ERROR_POES,
-                        holding=False,
-                        velocity=LINE_VELOCITY,
-                        acceleration=LINE_ACCELERATION
-                    )
+            nest_state = States.SORT_AREA
+        
         elif state == States.SORT_AREA:
 
             res = self.motion_request_send(

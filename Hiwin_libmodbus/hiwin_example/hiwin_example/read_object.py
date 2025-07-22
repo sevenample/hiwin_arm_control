@@ -62,7 +62,7 @@ class ShapeClassifier(Node):
 
     def classify_shape(self, adc, b1, b2, b3, b4):
         if adc >= 1000:
-            return 'A' if b1 == 0 else 'G' # 大立方體或長方體
+            return 'A' #if b1 == 0 else 'G' # 大立方體或長方體
         elif adc >= 870:
             return 'F' # 六角柱
         elif 690 <= adc <= 820:
