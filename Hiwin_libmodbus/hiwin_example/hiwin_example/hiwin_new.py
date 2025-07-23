@@ -32,9 +32,9 @@ Number_of_grips = 2
 # 左右偏移量
 Offset = 35.0
 # 下降偏移量
-Down_Offset = [145.0,86.0,26.0,30.0]
+# Down_Offset = [145.0,86.0,26.0,30.0]
 
-# Down_Offset = [140.0,81.0,21.0,25.0]
+Down_Offset = [140.0,75.0,21.0,29.0]
 
 # 21 -31 -96
 
@@ -55,49 +55,45 @@ IO = {1:1,
 IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
             Digitalcmd.Request.DIGITAL_ON]
 
-
-# 錯誤物料區域基礎座標
-error = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
-
+ERROR_POES = [471.00, 177.00, 230.00, -180.00, 0.00, 90.000]
 
 Sorting_area_base = [
-    ([311.0, 463.0,  210.0, -180.0, 0.00, 90.00],[241.0, 463.0,  210.0, -180.0, 0.00, 90.00],[171.0,  463.0,  210.0, -180.0, 0.00, 90.00]),  # A row
-    ([311.0, 367.0,  210.0, -180.0, 0.00, 90.00],[241.0, 367.0,  210.0, -180.0, 0.00, 90.00],[171.0,  367.0,  210.0, -180.0, 0.00, 90.00]), # B row
-    ([311.0, 277.0,  210.0, -180.0, 0.00, 90.00],[241.0, 277.0,  210.0, -180.0, 0.00, 90.00],[171.0,  277.0,  210.0, -180.0, 0.00, 90.00]),  # C row
-    ([31.0,  463.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 463.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 463.0,  210.0, -180.0, 0.00, 90.00]),   # D row
-    ([31.0,  367.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 367.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 367.0,  210.0, -180.0, 0.00, 90.00]),   # E row
-    ([31.0,  277.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 277.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 277.0,  210.0, -180.0, 0.00, 90.00]),   # F row
-    (error, error, error, error, error, error, error,),  # G row
-
+    ([404.0, 463.0,  230.0, -180.0, 0.00, 90.00],[318.0, 463.0,  230.0, -180.0, 0.00, 90.00],[236.0,  463.0,  230.0, -180.0, 0.00, 90.00],[152.0,  463.0,  230.0, -180.0, 0.00, 90.00]),  # A row
+    ([404.0, 356.0,  230.0, -180.0, 0.00, 90.00],[318.0, 356.0,  230.0, -180.0, 0.00, 90.00],[236.0,  356.0,  230.0, -180.0, 0.00, 90.00],[152.0,  356.0,  230.0, -180.0, 0.00, 90.00]), # B row
+    ([404.0, 265.0,  230.0, -180.0, 0.00, 90.00],[318.0, 265.0,  230.0, -180.0, 0.00, 90.00],[236.0,  265.0,  230.0, -180.0, 0.00, 90.00],[152.0,  265.0,  230.0, -180.0, 0.00, 90.00]),  # C row
+    ([58.0,  463.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 463.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 463.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 463.0,  230.0, -180.0, 0.00, 90.00]),   # D row
+    ([58.0,  356.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 356.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 356.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 356.0,  230.0, -180.0, 0.00, 90.00]),   # E row
+    ([58.0,  265.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 265.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 265.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 265.0,  230.0, -180.0, 0.00, 90.00]), # F row
+    (ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES)  # G row
 ]
 
-
+# 錯誤物料區域基礎座標
 
 OBJECT_POSES = [    
-    ([-250.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
-    ([-250.0, 285.0, 210.0, -180.00, 0.00, 90.00]),
-    ([-250.0, 385.0, 210.0, -180.00, 0.00, 90.00]),
-    ([-426.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
-    ([-426.0, 285.0, 210.0, -180.00, 0.00, 90.00]),
-    ([-426.0, 385.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-257.0, 159.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-257.0, 258.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-257.0, 355.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-427.0, 159.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-427.0, 258.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-427.0, 355.0, 230.0, -180.00, 0.00, 90.00]),
 
 
-    ([-545.0, 255.0, 210.0, -180.00, 0.00, 180.00]),
-    ([-545.0, 354.0, 210.0, -180.00, 0.00, 180.00]),
+    ([-545.0, 255.0, 230.0, -180.00, 0.00, 180.00]),
+    ([-545.0, 354.0, 230.0, -180.00, 0.00, 180.00]),
 ]
 
 ORDER_POSES = [
-    ([383.0, -455.0, 210.0, -180.00, 0.00, 90.00]),
-    ([383.0, -360.0,  210.0, -180.00, 0.00, 90.00]),
-    ([383.0, -266.0,  210.0, -180.00, 0.00, 90.00]),
+    ([383.0, -455.0, 230.0, -180.00, 0.00, 90.00]),
+    ([383.0, -360.0,  230.0, -180.00, 0.00, 90.00]),
+    ([383.0, -266.0,  230.0, -180.00, 0.00, 90.00]),
 
-    ([383.0, -160.0,  210.0, -180.00, 0.00, 90.00]),
-    ([383.0, -60.0,  210.0, -180.00, 0.00, 90.00]),
-    ([383.0, 20.0,  210.0, -180.00, 0.00, 90.00]),
+    ([383.0, -160.0,  230.0, -180.00, 0.00, 90.00]),
+    ([383.0, -60.0,  230.0, -180.00, 0.00, 90.00]),
+    ([383.0, 20.0,  230.0, -180.00, 0.00, 90.00]),
 
-    ([594.0, -160.0,  210.0, -180.00, 0.00, 90.00]),
-    ([594.0, -60.0,  210.0, -180.00, 0.00, 90.00]),
-    ([594.0, 20.0,  210.0, -180.00, 0.00, 90.00]),
+    ([594.0, -160.0,  230.0, -180.00, 0.00, 90.00]),
+    ([594.0, -60.0,  230.0, -180.00, 0.00, 90.00]),
+    ([594.0, 20.0,  230.0, -180.00, 0.00, 90.00]),
 
 
 ]
@@ -121,6 +117,7 @@ class States(Enum):
     ORDER_PLACE = 13
     END_HOME_MOVE = 14
 
+    ERROR_PLACE = 15
 
 class ExampleStrategy(Node):
 
@@ -130,10 +127,10 @@ class ExampleStrategy(Node):
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
         
-        self.count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0,'G':0}
+        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1,'E': 1,'F': 1,'G': 1}
         self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5, 'G':6}
 
-        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 
+        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3 
         random.shuffle(self.catch_items)
         del self.catch_items[15:]
 
@@ -152,7 +149,7 @@ class ExampleStrategy(Node):
 
         self.same = 0
 
-        self.sort_count_map = {'A': 0, 'B': 0, 'C': 0, 'D': 0,'E':0,'F':0, 'G':0}
+        self.sort_count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1,'E': 1,'F': 1,}
         # 訂閱 OrderArray 類型的訊息
         self.order_subscription = self.create_subscription(
             OrderArray,
@@ -163,7 +160,7 @@ class ExampleStrategy(Node):
         # 訂閱 CatchArray 類型的訊息
         self.catch_subscription = self.create_subscription(
             CatchArray,
-            'catch_list',
+            'detected_shapes',
             self.catch_callback,
             10)
         
@@ -178,7 +175,6 @@ class ExampleStrategy(Node):
 
     def catch_callback(self, msg):
         self.catch_count=msg.items
-        print("Catch received:", self.catch_count)
 
 
     def same_thing (self,pose):
@@ -191,7 +187,7 @@ class ExampleStrategy(Node):
 
     def down_pose(self, pose,state):
         new_pose = pose.copy()  # ← 建立一份新 list
-        if state in ('Z', 'C', 'F',):
+        if state in ('Z', 'C', 'F'):
             new_pose[2] = Down_Offset[2]
         elif state in ('I'):
             new_pose[2] = Down_Offset[3]
@@ -201,7 +197,7 @@ class ExampleStrategy(Node):
         elif state in('A','D'):
             new_pose[2] = Down_Offset[0]
         elif state in ('G'):
-            new_pose[2] = Down_Offset[2] + 20.0
+            new_pose[2] = 30.0
         return new_pose
 
 
@@ -248,7 +244,7 @@ class ExampleStrategy(Node):
                 pose=OBJECT_POSES[self.order_area_num],
                 holding=False
                 )
-            nest_state = States.READ_ORDER
+            nest_state = States.CATCH_OBJECT
             print("\n夾取第",self.order_area_num+1,"次來料區\n")
         
 
@@ -274,35 +270,35 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=OBJECT_POSES[self.order_area_num],
-                holding=False,
+                holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
             nest_state = States.READ_OBJECT
 
         elif state == States.READ_OBJECT:
-            # self.item = self.catch_count
-            self.item = self.catch_items[:Number_of_grips]
-            del self.catch_items[:Number_of_grips]
+            print("抓取物品",self.catch_count)
+            self.item = self.catch_count
+            i = 0
+            # self.item = self.catch_items[:Number_of_grips]
+            # del self.catch_items[:Number_of_grips]
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             for j, item in enumerate(self.item):
                 if item == 'NONE':
-                    if j == 0:
+                    if j == 1:
                         self.catch_num += 1
-                    return
-                row = self.order_map[item]
-                col = self.count_map[item]
-
-                # 計算位置（加上列的基礎座標 + 欄位間隔）
-                x,y,z,rx,ry,rz = Sorting_area_base[row][col]
-
-                if j == 0:
-                    x -= Offset
-                elif j == 1:
-                    x += Offset
+                else:
+                    row = self.order_map[item]
+                    col = self.count_map[item]
+                    if j == 1:
+                        col -= 1
+                    # 計算位置（加上列的基礎座標 + 欄位間隔）
+                    x,y,z,rx,ry,rz = Sorting_area_base[row][col]
 
 
-                self.count_map[item] += 1
-                self.Sorting_palce.append([x,y,z,rx,ry,rz])
+
+
+                    self.count_map[item] += 1
+                    self.Sorting_palce.append([x,y,z,rx,ry,rz])
             self.same = self.same_thing (self.Sorting_palce)
             self.order_area_num += 1
             nest_state = States.SORT_AREA
@@ -362,7 +358,16 @@ class ExampleStrategy(Node):
                 print('next')
                 nest_state = States.SORT_AREA
             else:
-                if  self.order_area_num < 8:
+                if  self.order_area_num < 9:
+                    for i in range(1, 3):
+                        res2 = self.digital_request_send(
+                            cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                            # digital_input_pin=1,
+                            digital_output_pin=IO[i*2],
+                            digital_output_cmd=IO_STATE[0],
+                            time_wait=0,
+                            holding=True
+                        )
                     self.Sorting_palce = []
                     self.catch_num = 0
                     nest_state = States.OBJECT_AREA
@@ -398,16 +403,11 @@ class ExampleStrategy(Node):
                     else:
                         row = self.order_map[item]
                         col = self.sort_count_map[item]
-                        # 計算位置（加上列的基礎座標 + 欄位間隔）
-                        # x,y,z,rx,ry,rz = Sorting_area_base[row]
-                        # x = x - col * 75.0
+
+                        if j == 1:
+                            col -= 1
+
                         x,y,z,rx,ry,rz = Sorting_area_base[row][col]
-                        if j == 0:
-                            x -= Offset
-                            print("👉 第一個物體：夾具偏移 (x - 50)")
-                        elif j == 1:
-                            x += Offset
-                            print("🔁 第三個物體：夾具偏移 (x + 50)")
                         self.sort_count_map[item] += 1
                         self.Order_palce.append([x,y,z,rx,ry,rz])
                         self.same = self.same_thing (self.Order_palce)
@@ -508,7 +508,7 @@ class ExampleStrategy(Node):
             self.order_palce_num+=1
             print("完成",self.order_palce_num+1)  
 
-            if self.  :
+            if self.oder_items :
                 print("next order")
                 self.order_palce = []
                 self.order_catch_palce_num= 0

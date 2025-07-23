@@ -45,7 +45,7 @@ class ShapeClassifier(Node):
                 label2 = self.code_to_chinese.get(code2, '未知')
 
                 msg = CatchArray()
-                msg.items = [code1, code2]
+                msg.items = [code2, code1]
                 self.publisher_.publish(msg)
 
                 # 儲存最近結果（GUI 按下按鈕時才顯示）
@@ -62,24 +62,28 @@ class ShapeClassifier(Node):
 
     def classify_shape(self, adc, b1, b2, b3, b4):
         if adc >= 1000:
-            return 'A' #if b1 == 0 else 'G' # 大立方體或長方體
+            if b1 != 0 and b3 != 0:
+                return 'F' # 六角柱
+            else:
+                return 'A' # 大立方體
+            #return 'A' if b1 == 0 else 'G' # 大立方體或長方體
         elif adc >= 870:
             return 'F' # 六角柱
         elif 690 <= adc <= 820:
-            return 'B' if b2 == 0 else 'E' # 中立方體或三角柱
+            return 'B' #if b2 == 0 else 'E' # 中立方體或三角柱
         elif 480 <= adc <= 680:
-            if b4 == 0 or b2 == 0:
+            if b4 == 0 or b2 == 0 or b3 == 0:
                 return 'G' # 長方體（異常）
-            elif b1 == 0 and b3 != 0:
-                return 'G' # 長方體（異常）
-            elif b2 == 0 and b3 == 0:
-                return 'F' # 六角柱（躺）
+            # elif b1 == 0 and b3 != 0:
+            #     return 'G' # 長方體（異常）
+            # elif b2 == 0 and b3 == 0:
+            #     return 'F' # 六角柱（躺）
             else:
                 return 'D' # 圓柱
             
-        elif 380 <= adc <= 460:
-            return 'E' # 三角柱（躺）
-        elif 200 <= adc <= 370:
+        elif 370 <= adc <= 460:
+             return 'E' # 三角柱
+        elif 200 <= adc <= 360:
             return 'G' # 長方體（異常）
         elif 35 <= adc <= 150:
             return 'C' # 小立方體
