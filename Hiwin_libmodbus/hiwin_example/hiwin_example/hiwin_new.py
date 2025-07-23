@@ -56,6 +56,10 @@ IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
             Digitalcmd.Request.DIGITAL_ON]
 
 
+# 錯誤物料區域基礎座標
+error = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
+
+
 Sorting_area_base = [
     ([311.0, 463.0,  210.0, -180.0, 0.00, 90.00],[241.0, 463.0,  210.0, -180.0, 0.00, 90.00],[171.0,  463.0,  210.0, -180.0, 0.00, 90.00]),  # A row
     ([311.0, 367.0,  210.0, -180.0, 0.00, 90.00],[241.0, 367.0,  210.0, -180.0, 0.00, 90.00],[171.0,  367.0,  210.0, -180.0, 0.00, 90.00]), # B row
@@ -63,12 +67,11 @@ Sorting_area_base = [
     ([31.0,  463.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 463.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 463.0,  210.0, -180.0, 0.00, 90.00]),   # D row
     ([31.0,  367.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 367.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 367.0,  210.0, -180.0, 0.00, 90.00]),   # E row
     ([31.0,  277.0,  210.0, -180.0, 0.00, 90.00],[-39.0, 277.0,  210.0, -180.0, 0.00, 90.00],[-109.0, 277.0,  210.0, -180.0, 0.00, 90.00]),   # F row
-    ([-218.0,545.0, 210.0, -180.0, 0.00, -90.00],[241.0, 545.0,  210.0, -180.0, 0.00, -90.00],[171.0,  177.0,  210.0, -180.0, 0.00, -90.00]),  # G row
+    (error, error, error, error, error, error, error,),  # G row
 
 ]
 
-# 錯誤物料區域基礎座標
-ERROR_POES = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
+
 
 OBJECT_POSES = [    
     ([-250.0, 185.0, 210.0, -180.00, 0.00, 90.00]),
@@ -118,7 +121,6 @@ class States(Enum):
     ORDER_PLACE = 13
     END_HOME_MOVE = 14
 
-    ERROR_PLACE = 15
 
 class ExampleStrategy(Node):
 
@@ -189,7 +191,7 @@ class ExampleStrategy(Node):
 
     def down_pose(self, pose,state):
         new_pose = pose.copy()  # ← 建立一份新 list
-        if state in ('Z', 'C', 'F', 'G'):
+        if state in ('Z', 'C', 'F',):
             new_pose[2] = Down_Offset[2]
         elif state in ('I'):
             new_pose[2] = Down_Offset[3]
@@ -198,6 +200,8 @@ class ExampleStrategy(Node):
             new_pose[2] = Down_Offset[1]
         elif state in('A','D'):
             new_pose[2] = Down_Offset[0]
+        elif state in ('G'):
+            new_pose[2] = Down_Offset[2] + 20.0
         return new_pose
 
 
@@ -282,7 +286,7 @@ class ExampleStrategy(Node):
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             for j, item in enumerate(self.item):
                 if item == 'NONE':
-                    if j == 1:
+                    if j == 0:
                         self.catch_num += 1
                     return
                 row = self.order_map[item]
@@ -504,7 +508,7 @@ class ExampleStrategy(Node):
             self.order_palce_num+=1
             print("完成",self.order_palce_num+1)  
 
-            if self.oder_items :
+            if self.  :
                 print("next order")
                 self.order_palce = []
                 self.order_catch_palce_num= 0
