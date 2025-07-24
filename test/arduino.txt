@@ -1,0 +1,34 @@
+void loop() {
+  int adc1 = analogRead(A0);
+  int adc2 = digitalRead(A1);
+  int adc3 = digitalRead(A2);
+  int adc4 = digitalRead(A3);
+
+  int adc5 = digitalRead(A4);
+  int adc6 = analogRead(A5);
+  int adc7 = digitalRead(A6);
+  int adc8 = digitalRead(A7);
+
+  int adc9 = digitalRead(A8);
+  int adc10 = digitalRead(A9);
+
+  Serial.print(adc1);
+  Serial.print(",");
+  Serial.print(adc2);
+  Serial.print(",");
+  Serial.print(adc3);
+  Serial.print(",");
+  Serial.print(adc4);
+  Serial.print(",");
+  Serial.println(adc5);
+  Serial.print(",");
+  Serial.print(adc6);
+  Serial.print(",");
+  Serial.print(adc7);
+  Serial.print(",");
+  Serial.print(adc8);
+  Serial.print(",");
+  Serial.println(adc9);
+
+  delay(100);
+}
