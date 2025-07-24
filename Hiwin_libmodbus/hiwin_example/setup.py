@@ -29,7 +29,7 @@ setup(
             # 'three_points_calibration_example = hiwin_example.three_points_calibration_example:main',
             'hiwin_new=hiwin_example.hiwin_new:main',
             'read_object=hiwin_example.read_object:main',
-            'test=hiwin_example.test:main',
+            'read=hiwin_example.order_sub:main',
         ],
     },
 )
