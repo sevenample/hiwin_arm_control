@@ -8,7 +8,7 @@ from hiwin_msgs.msg import CatchArray
 class ShapeClassifier(Node):
     def __init__(self):
         super().__init__('shape_classifier')
-        self.ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+        self.ser = serial.Serial('/dev/ttyUSB2', 9600, timeout=1)
         self.publisher_ = self.create_publisher(CatchArray, 'detected_shapes', 10)
         self.timer = self.create_timer(0.1, self.read_serial_data)
 
@@ -85,9 +85,9 @@ class ShapeClassifier(Node):
              return 'E' # 三角柱
         elif 200 <= adc <= 360:
             return 'G' # 長方體（異常）
-        elif 35 <= adc <= 150:
+        elif 25 <= adc <= 150:                                              
             return 'C' # 小立方體
-        elif adc < 30:
+        elif adc < 25 and (b3 == 0 or b4 == 0):
             return 'G' # 小長方體（異常）
         else:
             return 'NONE'
