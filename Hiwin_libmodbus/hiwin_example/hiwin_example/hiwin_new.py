@@ -27,6 +27,7 @@ LINE_ACCELERATION = 100
 
 
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
+
 # 抓取物件數
 Number_of_grips = 2
 # 左右偏移量
@@ -34,7 +35,7 @@ Offset = 35.0
 # 下降偏移量
 # Down_Offset = [145.0,86.0,26.0,30.0]
 
-Down_Offset = [140.0,75.0,21.0,29.0]
+Down_Offset = [21.0,29.0,140.0,75.0,30.0]
 
 # 21 -31 -96
 
@@ -129,12 +130,12 @@ class ExampleStrategy(Node):
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
         
-        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1,'E': 1,'F': 1,'G': 1}
-        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3,'E':4,'F':5, 'G':6}
+        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1}
+        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6}
 
-        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3 
-        random.shuffle(self.catch_items)
-        del self.catch_items[15:]
+        # self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3 
+        # random.shuffle(self.catch_items)
+        # del self.catch_items[15:]
 
         self.order_area_num = 0
         self.item = []
@@ -190,16 +191,15 @@ class ExampleStrategy(Node):
     def down_pose(self, pose,state):
         new_pose = pose.copy()  # ← 建立一份新 list
         if state in ('Z', 'C', 'F'):
-            new_pose[2] = Down_Offset[2]
+            new_pose[2] = Down_Offset[0]
         elif state in ('I'):
-            new_pose[2] = Down_Offset[3]
-
-        elif state in('B' ,'E'):
             new_pose[2] = Down_Offset[1]
         elif state in('A','D'):
-            new_pose[2] = Down_Offset[0]
+            new_pose[2] = Down_Offset[2]
+        elif state in('B' ,'E'):
+            new_pose[2] = Down_Offset[3]
         elif state in ('G'):
-            new_pose[2] = 30.0
+            new_pose[2] = Down_Offset[4]
         return new_pose
 
 
@@ -244,7 +244,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 pose=OBJECT_POSES[self.order_area_num],
-                holding=False
+                holding=True
                 )
             nest_state = States.CATCH_OBJECT
             print("\n夾取第",self.order_area_num+1,"次來料區\n")
