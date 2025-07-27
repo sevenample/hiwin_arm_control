@@ -39,13 +39,13 @@ Down_Offset = [21.0,29.0,140.0,75.0,30.0]
 
 # 21 -31 -96
 
-
+base_point = [-262.0, 156.0, 20.0]
 # IO切換
 IO = {1:1,
       2:2,
       3:5,
       4:4}
-
+correction = True # 是否開啟校正
 
 # IO接反
 # IO = {1:2,
@@ -56,49 +56,49 @@ IO = {1:1,
 IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
             Digitalcmd.Request.DIGITAL_ON]
 
-ERROR_POES = [471.00, 177.00, 230.00, -180.00, 0.00, 90.000]
+ERROR_POES = [471.00, 177.00, 40.00, -180.00, 0.00, 90.000]
 
 Sorting_area_base = [
-    ([404.0, 463.0,  230.0, -180.0, 0.00, 90.00],[318.0, 463.0,  230.0, -180.0, 0.00, 90.00],[236.0,  463.0,  230.0, -180.0, 0.00, 90.00],[152.0,  463.0,  230.0, -180.0, 0.00, 90.00]),  # A row
-    ([404.0, 356.0,  230.0, -180.0, 0.00, 90.00],[318.0, 356.0,  230.0, -180.0, 0.00, 90.00],[236.0,  356.0,  230.0, -180.0, 0.00, 90.00],[152.0,  356.0,  230.0, -180.0, 0.00, 90.00]), # B row
-    ([404.0, 265.0,  230.0, -180.0, 0.00, 90.00],[318.0, 265.0,  230.0, -180.0, 0.00, 90.00],[236.0,  265.0,  230.0, -180.0, 0.00, 90.00],[152.0,  265.0,  230.0, -180.0, 0.00, 90.00]),  # C row
-    ([58.0,  463.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 463.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 463.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 463.0,  230.0, -180.0, 0.00, 90.00]),   # D row
-    ([58.0,  356.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 356.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 356.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 356.0,  230.0, -180.0, 0.00, 90.00]),   # E row
-    ([58.0,  265.0,  230.0, -180.0, 0.00, 90.00],[-16.0, 265.0,  230.0, -180.0, 0.00, 90.00],[-90.0, 265.0,  230.0, -180.0, 0.00, 90.00],[-176.0, 265.0,  230.0, -180.0, 0.00, 90.00]), # F row
+    ([404.0, 463.0,  140.0, -180.0, 0.00, 90.00],[318.0, 463.0,  140.0, -180.0, 0.00, 90.00],[236.0,  463.0,  140.0, -180.0, 0.00, 90.00],[ 152.0,  463.0,  140.0, -180.0, 0.00, 90.00]),  # A row
+    ([404.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[318.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[236.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[ 152.0,  356.0,  75.0,  -180.0, 0.00, 90.00]), # B row
+    ([404.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[318.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[236.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[ 152.0,  265.0,  20.0,  -180.0, 0.00, 90.00]),  # C row
+    ([58.0,  463.0,  140.0, -180.0, 0.00, 90.00],[-16.0, 463.0,  140.0, -180.0, 0.00, 90.00],[-90.0,  463.0,  140.0, -180.0, 0.00, 90.00],[-176.0,  463.0,  140.0, -180.0, 0.00, 90.00]),   # D row
+    ([58.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[-16.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[-90.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[-176.0,  356.0,  75.0,  -180.0, 0.00, 90.00]),   # E row
+    ([58.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[-16.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[-90.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[-176.0,  265.0,  20.0,  -180.0, 0.00, 90.00]), # F row
+
+
     (ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES)  # G row
 ]
 
 # 錯誤物料區域基礎座標
 
 OBJECT_POSES = [    
-    ([-262.0, 156.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-262.0, 253.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-262.0, 352.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-430.0, 156.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-430.0, 253.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-430.0, 352.0, 230.0, -180.00, 0.00, 90.00]),
+    ([-262.0,  156.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-262.0,  253.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-262.0,  352.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-430.0,  156.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-430.0,  253.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-430.0,  352.0,  20.0,    -180.00, 0.00, 90.00]),
 
 
-    ([-511.0, 156.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-511.0, 253.0, 230.0, -180.00, 0.00, 90.00]),
-    ([-511.0, 352.0, 210.0, -180.00, 0.00, 90.00]),
+    ([-511.0,  156.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-511.0,  253.0,  20.0,    -180.00, 0.00, 90.00]),
+    ([-511.0,  352.0,  20.0,    -180.00, 0.00, 90.00]),
 
 ]
 
 ORDER_POSES = [
-    ([387.0, 126.0, 230.0, -180.00, 0.00, 0.00]),
-    ([377.0, -98.0,  230.0, -180.00, 0.00, 0.00]),
-    ([377.0, -315.0,  230.0, -180.00, 0.00, 0.00]),
+    ([387.0,   126.0,   40.0,   -180.00, 0.00, 0.00]),
+    ([387.0,   -98.0,   40.0,   -180.00, 0.00, 0.00]),
+    ([387.0,   -315.0,  40.0,   -180.00, 0.00, 0.00]),
 
-    ([271.0, 130.0,  230.0, -180.00, 0.00, 90.00]),
-    ([267.0, 34.0,  230.0, -180.00, 0.00, 90.00]),
-    ([267.0, -83.0,  230.0, -180.00, 0.00, 90.00]),
+    ([271.0,    130.0,  40.0,   -180.00, 0.00, 90.00]),
+    ([267.0,     34.0,  40.0,   -180.00, 0.00, 90.00]),
+    ([267.0,    -83.0,  40.0,   -180.00, 0.00, 90.00]),
 
-    ([267.0, -190.0,  230.0, -180.00, 0.00, 90.00]),
-    ([594.0, -297.0,  230.0, -180.00, 0.00, 90.00]),
-    ([594.0, -410.0,  230.0, -180.00, 0.00, 90.00]),
-
-
+    ([267.0,   -190.0,  40.0,   -180.00, 0.00, 90.00]),
+    ([267.0,   -297.0,  40.0,   -180.00, 0.00, 90.00]),
+    ([267.0,   -410.0,  40.0,   -180.00, 0.00, 90.00]),
 ]
 
 class States(Enum):
@@ -169,16 +169,17 @@ class ExampleStrategy(Node):
         
         # 初始化統計數據
         self.catch_count = []
-
+# -----------------訂單--------------------------
     def order_callback(self, msg):
         flat_data = msg.item_names
         self.oder_items = [flat_data[i:i+2] for i in range(0, len(flat_data), 2)]
-
         print("Order received:", self.oder_items)
 
+# -----------------辨識------------------------------
     def catch_callback(self, msg):
         self.catch_count=msg.items
 
+# ---------------相同物體-------------------
 
     def same_thing (self,pose):
         if len(pose) >1:
@@ -187,24 +188,62 @@ class ExampleStrategy(Node):
                 return 1
         else :
             return 0
+        
+# ---------------上升(下降)-------------------
 
-    def down_pose(self, pose,state):
-        new_pose = pose.copy()  # ← 建立一份新 list
-        if state in ('Z', 'C', 'F'):
-            new_pose[2] = Down_Offset[0]
-        elif state in ('I'):
-            new_pose[2] = Down_Offset[1]
-        elif state in('A','D'):
-            new_pose[2] = Down_Offset[2]
-        elif state in('B' ,'E'):
-            new_pose[2] = Down_Offset[3]
-        elif state in ('G'):
-            new_pose[2] = Down_Offset[4]
+    # def down_pose(self, pose,state):
+    #     new_pose = pose.copy()  # ← 建立一份新 list
+    #     if state in ('Z', 'C', 'F'):
+    #         new_pose[2] = Down_Offset[0]
+    #     elif state in ('I'):
+    #         new_pose[2] = Down_Offset[1]
+    #     elif state in('A','D'):
+    #         new_pose[2] = Down_Offset[2]
+    #     elif state in('B' ,'E'):
+    #         new_pose[2] = Down_Offset[3]
+    #     elif state in ('G'):
+    #         new_pose[2] = Down_Offset[4]
+    #     return new_pose
+
+    def up_pose(self, pose):
+        new_pose = pose.copy()
+        new_pose[2] = 240.0  
         return new_pose
+# -------------------------------------------
+    
+# ---------------校正-------------------
+    def Correction(self, pose):
+            pose[0] -= base_point[0]
+            pose[1] -= base_point[1]
+            pose[2] -= base_point[2]
 
+    def Correction_sorting_place(self, pose):
+            for row in pose:
+                for pose in row:
+                    self.Correction(pose)
+
+    def Correction_place(self, pose):
+        for row in pose:
+            self.Correction(row)
+# ---------------------------------------------------
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
+            if correction:
+                self.Correction_place(OBJECT_POSES)
+                self.Correction_sorting_place(Sorting_area_base)
+                self.Correction_place(ORDER_POSES)
+            # res2 = self.digital_request_send(
+            #         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+            #         digital_input_pin=2,
+            #         digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
+            #         time_wait=0,
+            #         holding=False
+            #         )
+            # if res2 ==1 :
+            #     nest_state = States.HOME_MOVE
+            # else :
+            #     return
             self.get_logger().info('INIT')
             nest_state = States.HOME_MOVE
 
@@ -243,7 +282,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.order_area_num],
+                pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                 holding=True
                 )
             nest_state = States.CATCH_OBJECT
@@ -254,7 +293,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(OBJECT_POSES[self.order_area_num],'Z'),
+                pose=OBJECT_POSES[self.order_area_num],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -271,7 +310,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=OBJECT_POSES[self.order_area_num],
+                pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
@@ -318,7 +357,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.Sorting_palce[0],
+                pose=self.up_pose(self.Sorting_palce[0]),
                 holding=False
                 )
             nest_state = States.SORT_PLACE
@@ -329,7 +368,7 @@ class ExampleStrategy(Node):
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(self.Sorting_palce[0],self.item [self.catch_num]),
+                pose=self.Sorting_palce[0],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -356,7 +395,7 @@ class ExampleStrategy(Node):
             res3 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.Sorting_palce[0],
+                pose=self.up_pose(self.Sorting_palce[0]),
                 holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -427,7 +466,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.Order_palce[0],
+                pose=self.up_pose(self.Order_palce[0]),
                 holding=True
                 )
             nest_state = States.ORDER_OBJECT_PICK
@@ -438,7 +477,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(self.Order_palce[0],self.oder_item [self.order_catch_palce_num]),
+                pose=self.Order_palce[0],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -465,7 +504,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.Order_palce[0],
+                pose=self.up_pose(self.Order_palce[0]),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -482,7 +521,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=ORDER_POSES[self.order_palce_num],
+                pose=self.up_pose(ORDER_POSES[self.order_palce_num]),
                 holding=True
                 )
             print("移動至訂單區")
@@ -493,7 +532,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=self.down_pose(ORDER_POSES[self.order_palce_num],'I'),
+                pose=ORDER_POSES[self.order_palce_num],
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
@@ -510,7 +549,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                pose=ORDER_POSES[self.order_palce_num],
+                pose=self.up_pose(ORDER_POSES[self.order_palce_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
