@@ -247,7 +247,7 @@ class ExampleStrategy(Node):
             self.get_logger().info('INIT')
             nest_state = States.HOME_MOVE
 
-
+# ------------------回家-------------------
         elif state == States.HOME_MOVE:
             
             self.get_logger().info('HOME_MOVE !!!!!')
@@ -277,7 +277,7 @@ class ExampleStrategy(Node):
                 )
             nest_state = States.OBJECT_AREA
 
-
+# -------------------移動到定單區----------------
         elif state == States.OBJECT_AREA:
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
@@ -288,8 +288,9 @@ class ExampleStrategy(Node):
             nest_state = States.CATCH_OBJECT
             print("\n夾取第",self.order_area_num+1,"次來料區\n")
         
-
+# -------------------夾取定單區---------------------
         elif state == States.CATCH_OBJECT:
+            # -----------------下降--------------------
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -298,6 +299,7 @@ class ExampleStrategy(Node):
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
+            # ---------------  氣閥放開-----------------
             for i in range(1, 3):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
@@ -307,6 +309,7 @@ class ExampleStrategy(Node):
                     time_wait=0,
                     holding=True
                     )
+            # -------------------上升-------------------
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -315,6 +318,8 @@ class ExampleStrategy(Node):
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
             nest_state = States.READ_OBJECT
+
+ # ----------------------辨識物品-----------------------
 
         elif state == States.READ_OBJECT:
             print("抓取物品",self.catch_count)
@@ -351,7 +356,9 @@ class ExampleStrategy(Node):
             self.same = self.same_thing (self.Sorting_palce)
             self.order_area_num += 1
             nest_state = States.SORT_AREA
-        
+
+
+# --------------------移動到分檢區域---------------------
         elif state == States.SORT_AREA:
 
             res = self.motion_request_send(
@@ -363,7 +370,9 @@ class ExampleStrategy(Node):
             nest_state = States.SORT_PLACE
             print("準備放置物品",self.catch_num+1)
 
+# ---------------------放置物品--------------------
         elif state == States.SORT_PLACE:
+             # -----------------下降--------------------
             print(self.item [self.catch_num])
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
@@ -373,6 +382,7 @@ class ExampleStrategy(Node):
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
+            # ---------------  氣閥放開-----------------
             if self.same:
                 for i in range(1, 3):
                     res2 = self.digital_request_send(
@@ -391,7 +401,8 @@ class ExampleStrategy(Node):
                     digital_output_cmd=IO_STATE[0],
                     time_wait=0,
                     holding=True
-                    )
+                    )              
+            # -------------------上升-------------------
             res3 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -400,6 +411,7 @@ class ExampleStrategy(Node):
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
+            # ------------------判斷-------------------
             self.catch_num+=1
             print("放置物品",self.catch_num,"完成")  
             del self.Sorting_palce[0]
@@ -434,7 +446,7 @@ class ExampleStrategy(Node):
 
 
 
-
+# ----------------------讀取訂單----------------------
         elif state == States.READ_ORDER:
             print("進行訂單",self.oder_items)
             self.oder_item = self.oder_items[0]
@@ -462,6 +474,7 @@ class ExampleStrategy(Node):
                         self.same = self.same_thing (self.Order_palce)
                 nest_state = States.ORDER_OBJECT_AREA
 
+# -------------------移動到訂單物品區域-------------------
         elif state == States.ORDER_OBJECT_AREA:
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
@@ -473,7 +486,9 @@ class ExampleStrategy(Node):
             print("抓取",self.order_catch_palce_num+1,"個物品")
         
 
+# -------------------抓取訂單物品---------------------------
         elif state == States.ORDER_OBJECT_PICK:
+            # -----------------下降--------------------
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -481,7 +496,8 @@ class ExampleStrategy(Node):
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
-                )
+                )        
+            # ---------------  氣閥放開-----------------
             if self.same:
                 for i in range(1, 3):
                     res1 = self.digital_request_send(
@@ -501,6 +517,7 @@ class ExampleStrategy(Node):
                     time_wait=0,
                     holding=True
                     )
+            # -------------------上升-------------------
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -517,6 +534,8 @@ class ExampleStrategy(Node):
             else:
                 nest_state = States.ORDER_AREA
 
+
+# -------------------移動到訂單區域-------------------
         elif state == States.ORDER_AREA:
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
@@ -527,7 +546,11 @@ class ExampleStrategy(Node):
             print("移動至訂單區")
             nest_state = States.ORDER_PLACE
 
+
+# -------------------放置訂單物品-------------------
+
         elif state == States.ORDER_PLACE:
+            # -----------------下降--------------------
             # self.get_logger().info('down')
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
@@ -536,7 +559,8 @@ class ExampleStrategy(Node):
                 holding=True,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
-                )
+                )    
+            # ---------------  氣閥放開-----------------
             for i in range(1, 3):
                 res1 = self.digital_request_send(
                     cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
@@ -545,7 +569,8 @@ class ExampleStrategy(Node):
                     digital_output_cmd=IO_STATE[0],
                     time_wait=0,
                     holding=True
-                    )
+                    )                
+            # -------------------上升-------------------
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -554,9 +579,10 @@ class ExampleStrategy(Node):
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION
                 )
+            
             self.order_palce_num+=1
             print("完成",self.order_palce_num+1)  
-
+            # ----------判斷------------
             if self.oder_items :
                 print("next order")
                 self.order_palce = []
@@ -567,7 +593,8 @@ class ExampleStrategy(Node):
                 nest_state = States.END_HOME_MOVE
                 self.get_logger().info('All objects sorted, closing robot')
                 print("All objects sorted, closing robot")
-                self.num = 0
+                
+# -------------------回家-------------------
         elif state == States.END_HOME_MOVE:
             self.get_logger().info('end !!!!!')
             res = self.motion_request_send(
@@ -585,7 +612,7 @@ class ExampleStrategy(Node):
             res1 = self.digital_request_send(
                 cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                 # digital_input_pin=1,
-                digital_output_pin=20,
+                digital_output_pin=1,
                 digital_output_cmd=IO_STATE[1],
                 time_wait=0,
                 holding=True
@@ -593,7 +620,7 @@ class ExampleStrategy(Node):
             res2 = self.digital_request_send(
                 cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                 # digital_input_pin=1,
-                digital_output_pin=20,
+                digital_output_pin=5,
                 digital_output_cmd=IO_STATE[1],
                 time_wait=0,
                 holding=True
