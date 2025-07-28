@@ -27,7 +27,6 @@ LINE_ACCELERATION = 100
 
 
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
-
 # 抓取物件數
 Number_of_grips = 2
 # 左右偏移量
@@ -39,7 +38,7 @@ Down_Offset = [21.0,29.0,140.0,75.0,30.0]
 
 # 21 -31 -96
 
-base_point = [-262.0, 156.0, 20.0]
+base_point = [-430.0,  156.0,  20.0]
 # IO切換
 IO = {1:1,
       2:2,
@@ -56,18 +55,17 @@ correction = True # 是否開啟校正
 IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
             Digitalcmd.Request.DIGITAL_ON]
 
-ERROR_POES = [471.00, 177.00, 40.00, -180.00, 0.00, 90.000]
-
+ERROR_POES = [515.00, -279.00, 40.00, -180.00, 0.00, 90.000]
 Sorting_area_base = [
-    ([404.0, 463.0,  140.0, -180.0, 0.00, 90.00],[318.0, 463.0,  140.0, -180.0, 0.00, 90.00],[236.0,  463.0,  140.0, -180.0, 0.00, 90.00],[ 152.0,  463.0,  140.0, -180.0, 0.00, 90.00]),  # A row
-    ([404.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[318.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[236.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[ 152.0,  356.0,  75.0,  -180.0, 0.00, 90.00]), # B row
-    ([404.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[318.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[236.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[ 152.0,  265.0,  20.0,  -180.0, 0.00, 90.00]),  # C row
-    ([58.0,  463.0,  140.0, -180.0, 0.00, 90.00],[-16.0, 463.0,  140.0, -180.0, 0.00, 90.00],[-90.0,  463.0,  140.0, -180.0, 0.00, 90.00],[-176.0,  463.0,  140.0, -180.0, 0.00, 90.00]),   # D row
-    ([58.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[-16.0, 356.0,  75.0,  -180.0, 0.00, 90.00],[-90.0,  356.0,  75.0,  -180.0, 0.00, 90.00],[-176.0,  356.0,  75.0,  -180.0, 0.00, 90.00]),   # E row
-    ([58.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[-16.0, 265.0,  20.0,  -180.0, 0.00, 90.00],[-90.0,  265.0,  20.0,  -180.0, 0.00, 90.00],[-176.0,  265.0,  20.0,  -180.0, 0.00, 90.00]), # F row
+    ([404.0, 463.0,  142.0, -180.0, 0.00, 90.00],[320.0, 463.0,  142.0, -180.0, 0.00, 90.00],[235.0,  463.0,  142.0, -180.0, 0.00, 90.00],[ 152.0,  463.0,  142.0, -180.0, 0.00, 90.00]),  # A row
+    ([404.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[320.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[235.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[ 152.0,  356.0,  78.0,  -180.0, 0.00, 90.00]), # B row
+    ([404.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[320.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[235.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[ 152.0,  271.0,  20.0,  -180.0, 0.00, 90.00]),  # C row
+    ([70.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-14.0, 463.0,  142.0, -180.0, 0.00, 90.00],[-98.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-182.0,  463.0,  142.0, -180.0, 0.00, 90.00]),   # D row
+    ([70.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[-14.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[-98.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[-182.0,  356.0,  78.0,  -180.0, 0.00, 90.00]),   # E row
+    ([70.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[-14.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[-98.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[-182.0,  271.0,  20.0,  -180.0, 0.00, 90.00]), # F row
 
-
-    (ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES,ERROR_POES)  # G row
+    ([430.0,  92.0,  40.0,  -180.0, 0.00, 90.00],[430.0, 18.0,  40.0,  -180.0, 0.00, 90.00],[430.0,  -56.0,  40.0,  -180.0, 0.00, 90.00],[430.0,  -130.0,  40.0,  -180.0, 0.00, 90.00],[430.0,  -204.0,  20.0,  -180.0, 0.00, 90.00],[430.0,  -279.0,  20.0,  -180.0, 0.00, 90.00])
+      # G row
 ]
 
 # 錯誤物料區域基礎座標
@@ -92,8 +90,8 @@ ORDER_POSES = [
     ([387.0,   -98.0,   40.0,   -180.00, 0.00, 0.00]),
     ([387.0,   -315.0,  40.0,   -180.00, 0.00, 0.00]),
 
-    ([271.0,    130.0,  40.0,   -180.00, 0.00, 90.00]),
-    ([267.0,     34.0,  40.0,   -180.00, 0.00, 90.00]),
+    ([265.0,    126.0,  47.0,   -180.00, 0.00, 90.00]),
+    ([267.0,     21.0,  40.0,   -180.00, 0.00, 90.00]),
     ([267.0,    -83.0,  40.0,   -180.00, 0.00, 90.00]),
 
     ([267.0,   -190.0,  40.0,   -180.00, 0.00, 90.00]),
@@ -106,6 +104,8 @@ class States(Enum):
     HOME_MOVE = 1
     FINISH = 2    
     CLOSE_ROBOT= 3
+    CORRECTION = 20
+    
 
     OBJECT_AREA =4
     CATCH_OBJECT=5
@@ -126,16 +126,20 @@ class ExampleStrategy(Node):
 
     def __init__(self):
         super().__init__('example_strategy')
+        self.base_state = 0
+
+
         self.hiwin_client_mo = self.create_client(Motioncmd, 'motioncmd')
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
         
-        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1}
+        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 0}
         self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6}
 
-        # self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3 
-        # random.shuffle(self.catch_items)
-        # del self.catch_items[15:]
+        self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3 + ['G'] * 3 
+        random.shuffle(self.catch_items)
+        del self.catch_items[15:]
+        self.catch_items = ['G','G','G','G']
 
         self.order_area_num = 0
         self.item = []
@@ -229,27 +233,34 @@ class ExampleStrategy(Node):
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
+            res2 = self.digital_request_send(
+                    cmd_mode=Digitalcmd.Request.READ_DI,
+                    digital_input_pin=2,
+                    holding=False
+                    )
+            if res2.digital_state == 1:
+                self.get_logger().info('INIT')
+                nest_state = States.CORRECTION
+            else :
+                nest_state = States.INIT
+
+
+        elif state == States.CORRECTION:
             if correction:
+                self.base_state = 2
+                self.get_logger().info('CORRECTION !!!!!')
                 self.Correction_place(OBJECT_POSES)
                 self.Correction_sorting_place(Sorting_area_base)
                 self.Correction_place(ORDER_POSES)
-            # res2 = self.digital_request_send(
-            #         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
-            #         digital_input_pin=2,
-            #         digital_output_cmd=Digitalcmd.Request.DIGITAL_ON,
-            #         time_wait=0,
-            #         holding=False
-            #         )
-            # if res2 ==1 :
-            #     nest_state = States.HOME_MOVE
-            # else :
-            #     return
-            self.get_logger().info('INIT')
+                self.Correction(HOME_POSE)
+                print(HOME_POSE)
             nest_state = States.HOME_MOVE
+
 
 # ------------------回家-------------------
         elif state == States.HOME_MOVE:
             
+
             self.get_logger().info('HOME_MOVE !!!!!')
             for i in range(1, 3):
                 res1 = self.digital_request_send(
@@ -272,6 +283,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=HOME_POSE,
                 holding=True
                 )
@@ -282,6 +294,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                 holding=True
                 )
@@ -294,6 +307,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=OBJECT_POSES[self.order_area_num],
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -313,6 +327,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -325,8 +340,8 @@ class ExampleStrategy(Node):
             print("抓取物品",self.catch_count)
             self.item = self.catch_count
             i = 0
-            # self.item = self.catch_items[:Number_of_grips]
-            # del self.catch_items[:Number_of_grips]
+            self.item = self.catch_items[:Number_of_grips]
+            del self.catch_items[:Number_of_grips]
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             for j, item in enumerate(self.item):
                 if item == 'NONE':
@@ -344,10 +359,12 @@ class ExampleStrategy(Node):
                     row = self.order_map[item]
                     col = self.count_map[item]
                     if j == 1:
-                        col -= 1
+                        if item != 'G':
+                            col -= 1
                     # 計算位置（加上列的基礎座標 + 欄位間隔）
                     x,y,z,rx,ry,rz = Sorting_area_base[row][col]
-
+                    if j == 1 and item == 'G':
+                        x += 85
 
 
 
@@ -364,6 +381,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(self.Sorting_palce[0]),
                 holding=False
                 )
@@ -377,6 +395,7 @@ class ExampleStrategy(Node):
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.Sorting_palce[0],
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -406,6 +425,7 @@ class ExampleStrategy(Node):
             res3 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(self.Sorting_palce[0]),
                 holding=False,
                 velocity=LINE_VELOCITY,
@@ -437,6 +457,7 @@ class ExampleStrategy(Node):
                     res = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
                         cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                         pose=HOME_POSE,
                         holding=True
                         )
@@ -479,6 +500,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(self.Order_palce[0]),
                 holding=True
                 )
@@ -492,6 +514,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.Order_palce[0],
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -521,6 +544,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(self.Order_palce[0]),
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -540,6 +564,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(ORDER_POSES[self.order_palce_num]),
                 holding=True
                 )
@@ -555,6 +580,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=ORDER_POSES[self.order_palce_num],
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -574,6 +600,7 @@ class ExampleStrategy(Node):
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=self.up_pose(ORDER_POSES[self.order_palce_num]),
                 holding=True,
                 velocity=LINE_VELOCITY,
@@ -600,6 +627,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
                 pose=HOME_POSE,
                 holding=True
                 )
