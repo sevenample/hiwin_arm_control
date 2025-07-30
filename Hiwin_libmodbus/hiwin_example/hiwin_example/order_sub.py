@@ -78,10 +78,10 @@ class ShapeClassifier(Node):
                 if len(parts) != 10:
                     raise ValueError(f"資料長度不符: 預期10個數值，收到{len(parts)} -> '{line}'")
 
-                adc1, adc2, adc3, adc4, adc5, adc6, adc7, adc8, adc9 = map(int, parts)
+                adc1, adc2, adc3, adc4, adc5, adc6, adc7, adc8, adc9 ,adc10 = map(int, parts)
 
-                code1 = self.classify_shape(adc8, self.check_button(adc1), self.check_button(adc2), self.check_button(adc3), self.check_button(adc4))
-                code2 = self.classify_shape(adc9, self.check_button(adc5), self.check_button(adc6), self.check_button(adc7), self.check_button(adc8))
+                code1 = self.classify_shape(adc9, self.check_button(adc1), self.check_button(adc2), self.check_button(adc3), self.check_button(adc4))
+                code2 = self.classify_shape(adc10, self.check_button(adc5), self.check_button(adc6), self.check_button(adc7), self.check_button(adc8))
 
                 label1 = self.code_to_chinese.get(code1, '未知')
                 label2 = self.code_to_chinese.get(code2, '未知')

@@ -108,7 +108,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         left_layout.addWidget(self.summary_panel)
 
         self.tray_widget = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap("pan.jpg")  # 圖片檔名請確認
+        pixmap = QtGui.QPixmap("PAN.jpg")  # 圖片檔名請確認
         scaled_pixmap = pixmap.scaled(480, 371, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.tray_widget.setPixmap(scaled_pixmap)
         self.tray_widget.setAlignment(QtCore.Qt.AlignCenter)
@@ -127,6 +127,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
 
         self.orders = []
         zones = ['A', 'B', 'C', 'D', 'E','F']
+        # zones = ['E', 'C', 'A', 'F', 'D', 'B']
         items = [
             ('NONE', '無'),
             ('A', '大立方體'),

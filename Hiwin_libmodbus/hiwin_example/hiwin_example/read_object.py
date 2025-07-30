@@ -168,7 +168,7 @@ class ShapeClassifier(Node):
     # ---- 分類規則 ----
     # 以下留存您原本的備註（含被註解掉的邏輯），日後可隨時開啟/調整
     def classify_shape(self, adc, b1, b2, b3, b4):
-        if adc >= 1000:
+        if adc >= 970:
             if b1 != 0 and b3 != 0:
                 return 'F'  # 六角柱
             else:
