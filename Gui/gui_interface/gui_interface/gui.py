@@ -6,6 +6,27 @@ from std_msgs.msg import String
 from hiwin_msgs.msg import OrderArray
 import json
 
+
+ITEMS = [
+    ('NONE', '無'),
+    ('A', '大立方體'),
+    ('B', '中立方體'),
+    ('C', '小立方體'),
+    ('D', '圓柱'),
+    ('E', '三角柱'),
+    ('F', '六角柱')
+]
+
+ZONE_POSITIONS = {
+    'A': QtCore.QRectF(290, 200, 130, 130),
+    'B': QtCore.QRectF(290, 40, 130, 130),
+    'C': QtCore.QRectF(160, 45, 120, 120),
+    'D': QtCore.QRectF(20, 40, 130, 130),
+    'E': QtCore.QRectF(20, 200, 130, 130),
+    'F': QtCore.QRectF(150, 200, 130, 130),
+}
+
+
 class OrderPublisher(Node):
     def __init__(self):
         super().__init__('order_publisher')
@@ -18,14 +39,62 @@ class OrderPublisher(Node):
         self.publisher_.publish(msg)
         self.get_logger().info(f'{msg.item_names}')
 
+class TrayComboOverlay(QtWidgets.QWidget):
+    def __init__(self, update_callback):
+        super().__init__()
+        self.combo_boxes = []
+        self.tray_count = 3
+        self.combo_width = 50
+        self.combo_height = 30
+        self.update_callback = update_callback
+        self.init_combos()
+
+    def init_combos(self):
+        self.combo_boxes.clear()
+        
+        for tray_index in range(self.tray_count):
+            y_offset = tray_index * 360
+            tray_combos = {}
+            for zone, rect in ZONE_POSITIONS.items():
+                combo = QtWidgets.QComboBox(self)
+                for code, name in ITEMS:
+                    combo.addItem(name, code)
+                combo.setGeometry(
+                    int(rect.x() + (rect.width() - self.combo_width) / 2),
+                    int(rect.y() + y_offset + (rect.height() - self.combo_height) / 2),
+                    self.combo_width,
+                    self.combo_height
+                )
+                combo.currentIndexChanged.connect(self.update_callback)
+                combo.setMinimumContentsLength(4)   # 最少顯示幾個字元長度
+                combo.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
+                tray_combos[zone] = combo
+            self.combo_boxes.append(tray_combos)
+
+
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setPen(QtGui.QPen(QtCore.Qt.black, 2))
+        painter.setBrush(QtGui.QBrush(QtCore.Qt.lightGray))
+        for i in range(self.tray_count):
+            self.draw_tray(painter, i * 360)
+
+    def draw_tray(self, painter, y_offset):
+        painter.drawRoundedRect(QtCore.QRectF(20, 20 + y_offset, 460, 340), 15, 15)
+        painter.drawRoundedRect(QtCore.QRectF(50, 40 + y_offset, 130, 130), 20, 20)
+        painter.drawEllipse(QtCore.QPointF(250, 105 + y_offset), 60, 60)
+        painter.drawRoundedRect(QtCore.QRectF(320, 40 + y_offset, 130, 130), 20, 20)
+        painter.drawRoundedRect(QtCore.QRectF(40, 200 + y_offset, 270, 130), 20, 20)
+        painter.drawRoundedRect(QtCore.QRectF(320, 200 + y_offset, 130, 130), 20, 20)
+
 
 class MultiOrderTrayWindow(QtWidgets.QWidget):
-    def __init__(self, ros_node):
+    def __init__(self):
         super().__init__()
-        self.setWindowTitle("智慧裝配 - 訂單與盤子位置輸入")
-        self.setGeometry(300, 300, 1100, 700)
-        self.ros_node = ros_node
-        self.warnings_active = False
+        self.setWindowTitle("智慧裝配 - 視覺化訂單輸入")
+        self.setGeometry(300, 100, 1000, 1200)
 
         self.setStyleSheet("""
         QWidget {
@@ -37,14 +106,15 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
             border: none;
             background: rgba(245, 245, 245, 0.9);
             border-radius: 10px;
-            padding: 10px;
+            padding: 20px;
+            font-size: 20px;                   
         }
         QComboBox {
             border: 1px solid #d0d0d0;
             border-radius: 8px;
             padding: 6px 10px;
             background-color: white;
-            min-width: 140px;
+            min-width: 0px;
             selection-background-color: #e0e0e0;
             font-size: 15px;
         }
@@ -79,36 +149,23 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         QPushButton:hover {
             background-color: #005FCC;
         }
-        QGroupBox {
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            margin-top: 10px;
-            padding: 10px;
-        }
-        QGroupBox:title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 0 5px;
-        }
         """)
 
-        self.setContentsMargins(20, 20, 20, 20)
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QHBoxLayout(self)
         layout.setSpacing(20)
-        self.setLayout(layout)
 
+        # 左邊資訊區
         left_layout = QtWidgets.QVBoxLayout()
-        left_layout.setSpacing(15)
         layout.addLayout(left_layout, 1)
 
         self.summary_panel = QtWidgets.QTextEdit()
         self.summary_panel.setReadOnly(True)
         self.summary_panel.setPlaceholderText("📦 即時物件數量統計")
-        self.summary_panel.setMaximumHeight(120)
+        self.summary_panel.setMaximumHeight(280)
         left_layout.addWidget(self.summary_panel)
 
         self.tray_widget = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap("PAN.jpg")  # 圖片檔名請確認
+        pixmap = QtGui.QPixmap("PN.jpg")
         scaled_pixmap = pixmap.scaled(480, 371, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.tray_widget.setPixmap(scaled_pixmap)
         self.tray_widget.setAlignment(QtCore.Qt.AlignCenter)
@@ -121,102 +178,91 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         self.result_panel.setMinimumHeight(200)
         left_layout.addWidget(self.result_panel)
 
+        # 右側為餐盤 + 按鈕
+        # 右側為餐盤 + 按鈕
         right_layout = QtWidgets.QVBoxLayout()
-        right_layout.setSpacing(15)
         layout.addLayout(right_layout, 1)
 
-        self.orders = []
-        zones = ['A', 'B', 'C', 'D', 'E','F']
-        # zones = ['E', 'C', 'A', 'F', 'D', 'B']
-        items = [
-            ('NONE', '無'),
-            ('A', '大立方體'),
-            ('B', '中立方體'),
-            ('C', '小立方體'),
-            ('D', '圓柱'),
-            ('E', '三角柱'),
-            ('F', '六角柱')
-        ]
+        # 滾動容器區
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
 
-        for i in range(3):
-            group_box = QtWidgets.QGroupBox(f"訂單 {i+1}")
-            form_layout = QtWidgets.QFormLayout()
-            order_inputs = {}
-            for zone in zones:
-                combo_box = QtWidgets.QComboBox()
-                for code, name in items:
-                    combo_box.addItem(f"{name}", code)  # 顯示不帶 A-
-                combo_box.currentIndexChanged.connect(self.update_summary)
-                form_layout.addRow(f"區域 {zone}", combo_box)
-                order_inputs[zone] = combo_box
-            group_box.setLayout(form_layout)
-            right_layout.addWidget(group_box)
-            self.orders.append(order_inputs)
+        self.tray_zone_area = TrayComboOverlay(self.update_summary)
 
+        # 包裝 tray_zone_area 進 QWidget 才能設 QVBoxLayout
+        tray_container = QtWidgets.QWidget()
+        tray_layout = QtWidgets.QVBoxLayout(tray_container)
+        tray_layout.setContentsMargins(0, 0, 0, 0)
+        tray_layout.addWidget(self.tray_zone_area)
+        scroll_area.setWidget(tray_container)
+
+        right_layout.addWidget(scroll_area)
+
+        # 右下角提交按鈕
+        btn_layout = QtWidgets.QHBoxLayout()
+        btn_layout.addStretch()
         self.submit_btn = QtWidgets.QPushButton("✅ 提交")
+        self.submit_btn.setFixedWidth(500)
         self.submit_btn.clicked.connect(self.submit_orders)
-        right_layout.addWidget(self.submit_btn)
+        btn_layout.addWidget(self.submit_btn)
+        right_layout.addLayout(btn_layout)
+
+
+        self.update_summary()
 
     def update_summary(self):
-        item_counter = {}
-        item_names = {
-            "A": "大立方體",
-            "B": "中立方體",
-            "C": "小立方體",
-            "D": "圓柱",
-            "E": "三角柱",
-            "F": "六角柱"
-        }
+        o = 0
+        counter = {}
+        for tray in self.tray_zone_area.combo_boxes:
+            for cb in tray.values():
+                val = cb.currentData()
+                if val != "NONE":
+                    counter[val] = counter.get(val, 0) + 1
+                    o +=1
 
-        for order in self.orders:
-            for cb in order.values():
-                item = cb.currentData()
-                if item != 'NONE':
-                    item_counter[item] = item_counter.get(item, 0) + 1
-
+        item_names = {code: name for code, name in ITEMS if code != "NONE"}
         summary_html = "<b>📦 即時物件數量統計：</b><br>"
+        summary_html += f"總共：{o} 個<br>"
+
         warnings = []
 
-        for item_code, count in item_counter.items():
-            name = item_names.get(item_code, item_code)
+        for code, name in item_names.items():
+            count = counter.get(code, 0)
             if count > 3:
                 summary_html += f"{name}：{count} 個 <span style='color:red'>⚠️ 超過 3 個</span><br>"
-                warnings.append(f"「{name}」超過 3 個！")
+                warnings.append(name)
             else:
                 summary_html += f"{name}：{count} 個<br>"
 
         self.summary_panel.setHtml(summary_html)
 
         if warnings:
-            self.warnings_active = True
             self.submit_btn.setEnabled(False)
             self.submit_btn.setStyleSheet("background-color: #ccc; color: #666;")
         else:
-            self.warnings_active = False
             self.submit_btn.setEnabled(True)
             self.submit_btn.setStyleSheet("background-color: #007AFF; color: white;")
 
     def submit_orders(self):
-        if self.warnings_active:
-            return
-
         result = ""
         matrix = []
-        for idx, order in enumerate(self.orders):
-            col = 1
-            result += f"🧾 訂單 {idx+1}:\n"
+        for idx, tray in enumerate(self.tray_zone_area.combo_boxes):
+            result += f"🧾 訂單 {idx + 1}:\n"
             row = []
-            for zone, cb in order.items():
-                item = cb.currentData()
-                row.append(item)
-                result += f"  區域 {zone}: {cb.currentText()}\n"
+            col = 1
+            for zone, cb in tray.items():
+                name = cb.currentText()
+                val = cb.currentData()
+                row.append(val)
+                result += f"  區域 {zone}: {name}\n"
                 if col == 2:
                     matrix.append(row)
                     row = []
                     col = 1
                 else:
                     col += 1
-            matrix.append(row)
+            if row:
+                matrix.append(row)
             result += "\n"
 
         self.result_panel.setText(result)
