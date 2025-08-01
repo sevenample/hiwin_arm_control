@@ -18,18 +18,21 @@ ITEMS = [
 ]
 
 ZONE_POSITIONS = {
-    'A': QtCore.QRectF(290, 200, 130, 130),
-    'B': QtCore.QRectF(290, 40, 130, 130),
-    'C': QtCore.QRectF(160, 45, 120, 120),
-    'D': QtCore.QRectF(20, 40, 130, 130),
-    'E': QtCore.QRectF(20, 200, 130, 130),
-    'F': QtCore.QRectF(150, 200, 130, 130),
+    'A': QtCore.QRectF(290, 160, 130, 130),
+    'B': QtCore.QRectF(290, 25, 130, 130),
+    'C': QtCore.QRectF(170, 30, 120, 120),
+    'D': QtCore.QRectF(30, 25, 130, 130),
+    'E': QtCore.QRectF(30, 160, 130, 130),
+    'F': QtCore.QRectF(160, 160, 130, 130),
 }
 
 
 class OrderPublisher(Node):
+
+
     def __init__(self):
         super().__init__('order_publisher')
+
         self.publisher_ = self.create_publisher(OrderArray, 'order_list', 10)
 
     def publish_matrix(self, matrix):
@@ -44,7 +47,7 @@ class TrayComboOverlay(QtWidgets.QWidget):
         super().__init__()
         self.combo_boxes = []
         self.tray_count = 3
-        self.combo_width = 50
+        self.combo_width = 90
         self.combo_height = 30
         self.update_callback = update_callback
         self.init_combos()
@@ -53,7 +56,7 @@ class TrayComboOverlay(QtWidgets.QWidget):
         self.combo_boxes.clear()
         
         for tray_index in range(self.tray_count):
-            y_offset = tray_index * 360
+            y_offset = tray_index * 300
             tray_combos = {}
             for zone, rect in ZONE_POSITIONS.items():
                 combo = QtWidgets.QComboBox(self)
@@ -79,22 +82,24 @@ class TrayComboOverlay(QtWidgets.QWidget):
         painter.setPen(QtGui.QPen(QtCore.Qt.black, 2))
         painter.setBrush(QtGui.QBrush(QtCore.Qt.lightGray))
         for i in range(self.tray_count):
-            self.draw_tray(painter, i * 360)
+            self.draw_tray(painter, i * 300)
 
     def draw_tray(self, painter, y_offset):
-        painter.drawRoundedRect(QtCore.QRectF(20, 20 + y_offset, 460, 340), 15, 15)
-        painter.drawRoundedRect(QtCore.QRectF(50, 40 + y_offset, 130, 130), 20, 20)
-        painter.drawEllipse(QtCore.QPointF(250, 105 + y_offset), 60, 60)
-        painter.drawRoundedRect(QtCore.QRectF(320, 40 + y_offset, 130, 130), 20, 20)
-        painter.drawRoundedRect(QtCore.QRectF(40, 200 + y_offset, 270, 130), 20, 20)
-        painter.drawRoundedRect(QtCore.QRectF(320, 200 + y_offset, 130, 130), 20, 20)
+        painter.drawRoundedRect(QtCore.QRectF(20, 20 + y_offset, 400,280), 15, 15)
+        painter.drawRoundedRect(QtCore.QRectF(50, 40 + y_offset, 90, 90), 20, 20)
+        painter.drawEllipse(QtCore.QPointF(230, 90 + y_offset), 50, 50)
+        painter.drawRoundedRect(QtCore.QRectF(310, 40 + y_offset, 90, 90), 20, 20)
+        painter.drawRoundedRect(QtCore.QRectF(40, 180 + y_offset, 240, 90), 20, 20)
+        painter.drawRoundedRect(QtCore.QRectF(310, 180 + y_offset, 90, 90), 20, 20)
 
 
 class MultiOrderTrayWindow(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self,ros_node):
         super().__init__()
+        self.ros_node = ros_node
+
         self.setWindowTitle("智慧裝配 - 視覺化訂單輸入")
-        self.setGeometry(300, 100, 1000, 1200)
+        self.setGeometry(300, 100, 800, 1000)
 
         self.setStyleSheet("""
         QWidget {
@@ -106,8 +111,8 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
             border: none;
             background: rgba(245, 245, 245, 0.9);
             border-radius: 10px;
-            padding: 20px;
-            font-size: 20px;                   
+            padding: 10px;
+            font-size: 18px;                   
         }
         QComboBox {
             border: 1px solid #d0d0d0;
@@ -116,7 +121,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
             background-color: white;
             min-width: 0px;
             selection-background-color: #e0e0e0;
-            font-size: 15px;
+            font-size: 12px;
         }
         QComboBox QAbstractItemView {
             border: 1px solid #d0d0d0;
@@ -202,7 +207,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         btn_layout = QtWidgets.QHBoxLayout()
         btn_layout.addStretch()
         self.submit_btn = QtWidgets.QPushButton("✅ 提交")
-        self.submit_btn.setFixedWidth(500)
+        self.submit_btn.setFixedWidth(430)
         self.submit_btn.clicked.connect(self.submit_orders)
         btn_layout.addWidget(self.submit_btn)
         right_layout.addLayout(btn_layout)

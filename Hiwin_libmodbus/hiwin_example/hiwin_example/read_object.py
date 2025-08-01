@@ -190,7 +190,10 @@ class ShapeClassifier(Node):
         elif 370 <= adc <= 460:
             return 'E'  # 三角柱
         elif 200 <= adc <= 360:
-            return 'G'  # 長方體（異常）
+            if b2 == 0 and adc > 330:
+                return 'E'
+            else:
+                return 'G'  # 長方體（異常）
         elif 25 <= adc <= 150:
             return 'C'  # 小立方體
         elif adc < 25 and (b3 == 0 or b4 == 0):
