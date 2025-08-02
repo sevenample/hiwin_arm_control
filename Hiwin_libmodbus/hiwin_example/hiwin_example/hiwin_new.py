@@ -58,10 +58,10 @@ IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
 uu_pose =[320.0, 271.0,  20.0,  -180.0, 0.00, 90.00]
 ERROR_POES = [515.00, -279.00, 40.00, -180.00, 0.00, 90.000]
 Sorting_area_base = [
-    ([320.0, 463.0,  142.0, -180.0, 0.00, 90.00],[235.0,  463.0,  142.0, -180.0, 0.00, 90.00],[ 152.0,  463.0,  142.0, -180.0, 0.00, 90.00],[ 69.0,  463.0,  142.0, -180.0, 0.00, 90.00]),  # A row
+    ([320.0, 463.0,  142.0, -180.0, 0.00, 90.00],[235.0,  463.0,  142.0, -180.0, 0.00, 90.00],[ 152.0,  463.0,  142.0, -180.0, 0.00, 90.00],[ 70.0,  463.0,  142.0, -180.0, 0.00, 90.00]),  # A row
     ([404.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[320.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[235.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[ 152.0,  356.0,  78.0,  -180.0, 0.00, 90.00]), # B row
     ([404.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[320.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[235.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[ 152.0,  271.0,  20.0,  -180.0, 0.00, 90.00]),  # C row
-    ([70.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-14.0, 463.0,  142.0, -180.0, 0.00, 90.00],[-98.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-182.0,  463.0,  142.0, -180.0, 0.00, 90.00]),   # D row
+    ([-14.0, 463.0,  142.0, -180.0, 0.00, 90.00],[-98.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-182.0,  463.0,  142.0, -180.0, 0.00, 90.00],[-266.0,  356.0,  78.0,  -180.0, 0.00, 90.00]),   # D row
     ([70.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[-14.0, 356.0,  78.0,  -180.0, 0.00, 90.00],[-98.0,  356.0,  78.0,  -180.0, 0.00, 90.00],[-182.0,  356.0,  78.0,  -180.0, 0.00, 90.00]),   # E row
     ([70.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[-14.0, 271.0,  20.0,  -180.0, 0.00, 90.00],[-98.0,  271.0,  20.0,  -180.0, 0.00, 90.00],[-182.0,  271.0,  20.0,  -180.0, 0.00, 90.00]), # F row
 
@@ -114,6 +114,7 @@ class States(Enum):
     READ_OBJECT = 6
     SORT_AREA = 7
     SORT_PLACE = 8
+    F_ERROR = 17
     
     READ_ORDER = 9
     ORDER_OBJECT_AREA =10
@@ -143,6 +144,7 @@ class ExampleStrategy(Node):
 
         self.catch_items = ['A'] * 3 + ['B'] * 3 + ['C'] * 3 + ['D'] * 3 + ['E'] * 3 + ['F'] * 3  
         random.shuffle(self.catch_items)
+
         self.order_area_num = 0
         self.item = ['NONE','NONE']
         self.oder_items = []   
@@ -157,6 +159,7 @@ class ExampleStrategy(Node):
         self.order_palce_num = 0
 
         self.same = 0
+        self.F = 0
 
         self.sort_count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1,'E': 1,'F': 1,}
         # 訂閱 OrderArray 類型的訊息
@@ -224,6 +227,11 @@ class ExampleStrategy(Node):
     def sort_up_pose(self, pose):
         new_pose = pose.copy()
         new_pose[2] = 80.0  
+        return new_pose
+    
+    def F_turn_pose(self, pose):
+        new_pose = pose.copy()
+        new_pose[5] = 110.0  
         return new_pose
 # -------------------------------------------
     
@@ -361,13 +369,7 @@ class ExampleStrategy(Node):
                 holding=False,
                 velocity=LINE_VELOCITY,
                 acceleration=LINE_ACCELERATION)
-            res = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.PTP,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
-                holding=True
-                )
+
 
             nest_state = States.READ_OBJECT
 
@@ -376,7 +378,6 @@ class ExampleStrategy(Node):
         elif state == States.READ_OBJECT:
             print("抓取物品",self.catch_count)
             self.item = self.catch_count
-            i = 0
             # self.item = self.catch_items[:Number_of_grips]
             # del self.catch_items[:Number_of_grips]
             print(f"\n🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
@@ -402,20 +403,68 @@ class ExampleStrategy(Node):
                     x,y,z,rx,ry,rz = Sorting_area_base[row][col]
                     if j == 1 and item == 'G':
                         x += 85
-
-
-
                     self.count_map[item] += 1
                     self.Sorting_palce.append([x,y,z,rx,ry,rz])
-            self.same = self.same_thing (self.Sorting_palce)
+            if self.F == 0 :
+                nest_state = States.F_ERROR
+            else : 
+                nest_state = States.SORT_AREA
+                res = self.motion_request_send(
+                    cmd_mode=Motioncmd.Request.PTP,
+                    cmd_type=Motioncmd.Request.POSE_CMD,
+                    base = self.base_state,
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
+                    holding=False
+                    )
 
-            self.order_area_num += 1
-            nest_state = States.SORT_AREA
-            
 
+        elif state == States.F_ERROR:
+            for j ,item in enumerate(self.item):
+                if item == 'F':
+                    self.F =1
+                    self.count_map['F'] -= 1
+                    res2 = self.motion_request_send(
+                        cmd_mode=Motioncmd.Request.LINE,
+                        cmd_type=Motioncmd.Request.POSE_CMD,
+                        base = self.base_state,
+                        pose=self.F_turn_pose(OBJECT_POSES[self.order_area_num]),
+                        holding=False,
+                        velocity=LINE_VELOCITY,
+                        acceleration=LINE_ACCELERATION
+                    )
+                    res1 = self.digital_request_send(
+                        cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+                        # digital_input_pin=1,
+                        digital_output_pin=IO[(j+1)*2],
+                        digital_output_cmd=IO_STATE[0],
+                        time_wait=0,
+                        holding=True
+                    )
+            res2 = self.motion_request_send(
+                cmd_mode=Motioncmd.Request.LINE,
+                cmd_type=Motioncmd.Request.POSE_CMD,
+                base = self.base_state,
+                pose=OBJECT_POSES[self.order_area_num],
+                holding=False,
+                velocity=LINE_VELOCITY,
+                acceleration=LINE_ACCELERATION
+                )
+            if self.F > 0 :
+                nest_state = States.CATCH_OBJECT
+            else :                
+                nest_state = States.SORT_AREA
+                res = self.motion_request_send(
+                    cmd_mode=Motioncmd.Request.PTP,
+                    cmd_type=Motioncmd.Request.POSE_CMD,
+                    base = self.base_state,
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
+                    holding=False
+                    )
 
 # --------------------移動到分檢區域---------------------
         elif state == States.SORT_AREA:
+            self.same = self.same_thing (self.Sorting_palce)
+            self.order_area_num += 1
             if self.item[self.catch_num] =='G':
                 if self.item != ['G', 'G']:
                     es = self.motion_request_send(
