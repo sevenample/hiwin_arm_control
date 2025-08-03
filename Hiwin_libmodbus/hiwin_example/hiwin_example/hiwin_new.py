@@ -533,7 +533,7 @@ class ExampleStrategy(Node):
                     pose=self.order_up_pose(self.Sorting_palce[0]),
                     holding=False
                     )
-                if self.item[0] =='G':
+                if self.item[0] =='G' and self.item != ['G', 'G']:
                     es = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
                         cmd_type=Motioncmd.Request.POSE_CMD,
