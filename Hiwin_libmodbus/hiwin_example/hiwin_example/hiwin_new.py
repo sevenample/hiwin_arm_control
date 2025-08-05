@@ -29,16 +29,8 @@ LINE_ACCELERATION = 100
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 89.000]
 # 抓取物件數
 Number_of_grips = 2
-# 左右偏移量
-Offset = 35.0
-# 下降偏移量
-# Down_Offset = [145.0,86.0,26.0,30.0]
 
-Down_Offset = [21.0,29.0,140.0,75.0,30.0]
 
-# 21 -31 -96
-
-base_point = [-430.0,  133.0,  20.0]
 # IO切換
 IO = {1:1,
       2:2,
@@ -55,8 +47,8 @@ correction = True # 是否開啟校正
 IO_STATE = [Digitalcmd.Request.DIGITAL_OFF,
             Digitalcmd.Request.DIGITAL_ON]
 
-uu_pose =[320.0, 271.0,  20.0,  -180.0, 0.00, 89.00]
-ERROR_POES = [515.00, -279.00, 40.00, -180.00, 0.00, 89.000]
+relay_point =[320.0, 271.0,  20.0,  -180.0, 0.00, 89.00]
+
 Sorting_area_base = [
     ([320.0, 463.0,  142.0, -180.0, 0.00, 89.00],[235.0,  463.0,  142.0, -180.0, 0.00, 89.00],[ 152.0,  463.0,  142.0, -180.0, 0.00, 89.00],[ 70.0,  463.0,  142.0, -180.0, 0.00, 89.00]),  # A row
     ([404.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[320.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[235.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[ 152.0,  356.0,  78.0,  -180.0, 0.00, 89.00]), # B row
@@ -83,8 +75,8 @@ OBJECT_POSES = [
     ([-511.0,  133.0,  20.0,    -180.00, 0.00, 89.00]),
     ([-511.0,  230.0,  20.0,    -180.00, 0.00, 89.00]),
     ([-511.0,  329.0,  20.0,    -180.00, 0.00, 89.00]),
-
 ]
+
 #訂單放置
 ORDER_POSES = [
     ([355.0,   5.0,   40.0,   -180.00, 0.00, 0.00]),
@@ -100,6 +92,9 @@ ORDER_POSES = [
     ([244.0,   -414.0,  40.0,   -180.00, 0.00, 89.00]),
     ([244.0,   -513.0,  40.0,   -180.00, 0.00, 89.00]),
 ]
+
+base_point = OBJECT_POSES[3][:3]
+
 
 class States(Enum):
     INIT = 0
@@ -124,9 +119,8 @@ class States(Enum):
     END_HOME_MOVE = 14
 
     ERROR_PLACE = 15
-    RELAY_POINT = 16
+    ORDER_RELAY_POINT = 16
 
-    ORDER_RELAY_POINT = 17
 
 class ExampleStrategy(Node):
 
@@ -213,7 +207,7 @@ class ExampleStrategy(Node):
     #     elif state in ('G'):
     #         new_pose[2] = Down_Offset[4]
     #     return new_pose
-
+# ------------------------------------------
     def up_pose(self, pose):
         new_pose = pose.copy()
         new_pose[2] = 200.0  
@@ -226,7 +220,7 @@ class ExampleStrategy(Node):
     
     def sort_up_pose(self, pose):
         new_pose = pose.copy()
-        new_pose[2] = 70.0  
+        new_pose[2] = 80.0  
         return new_pose
     
     def F_turn_pose(self, pose):
@@ -274,8 +268,7 @@ class ExampleStrategy(Node):
                 self.Correction_sorting_place(Sorting_area_base)
                 self.Correction_place(ORDER_POSES)
                 self.Correction(HOME_POSE)
-                self.Correction(uu_pose)
-
+                self.Correction(relay_point)
                 print(HOME_POSE)
             nest_state = States.HOME_MOVE
 
@@ -319,7 +312,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(uu_pose),
+                    pose=self.up_pose(relay_point),
                     holding=False
                     )
             res = self.motion_request_send(
@@ -361,7 +354,6 @@ class ExampleStrategy(Node):
                     time_wait=0,
                     holding=True
                     )
-            # -------------------上升-------------------
 
 
 
@@ -371,6 +363,7 @@ class ExampleStrategy(Node):
 
         elif state == States.READ_OBJECT:
             if self.F != 0:
+            # -------------------上升-------------------
                 res2 = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.LINE,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -419,6 +412,7 @@ class ExampleStrategy(Node):
                 nest_state = States.F_ERROR
             else : 
                 self.order_area_num += 1
+                self.same = self.same_thing (self.Sorting_palce)
                 self.F = 0
                 nest_state = States.SORT_AREA
 
@@ -428,8 +422,9 @@ class ExampleStrategy(Node):
                 if item != 'NONE':
                     self.count_map[item] -= 1
                     self.Sorting_palce = []
+
                 if item == 'F':
-                    self.F =1
+                    self.F = 1
                     res1 = self.digital_request_send(
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
                         # digital_input_pin=1,
@@ -459,10 +454,10 @@ class ExampleStrategy(Node):
                         velocity=LINE_VELOCITY,
                         acceleration=LINE_ACCELERATION
                         )
-
-
                 nest_state = States.CATCH_OBJECT
-            else :                
+
+            else :      
+                # -------------------上升-------------------
                 res2 = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.LINE,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -479,19 +474,19 @@ class ExampleStrategy(Node):
                     holding=False
                     )
                 self.order_area_num += 1
+                self.same = self.same_thing (self.Sorting_palce)
                 nest_state = States.SORT_AREA
 
 
 # --------------------移動到分檢區域---------------------
         elif state == States.SORT_AREA:
-            self.same = self.same_thing (self.Sorting_palce)
             if self.item[self.catch_num] =='G':
                 if self.item != ['G', 'G']:
                     es = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
                         cmd_type=Motioncmd.Request.POSE_CMD,
                         base = self.base_state,
-                        pose=self.up_pose(uu_pose),
+                        pose=self.up_pose(relay_point),
                         holding=False
                         )
                 res = self.motion_request_send(
@@ -515,7 +510,7 @@ class ExampleStrategy(Node):
 # ---------------------放置物品--------------------
         elif state == States.SORT_PLACE:
              # -----------------下降--------------------
-            print(self.item [self.catch_num])
+            print(f"放置 {self.item [self.catch_num]}")
             res1 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.LINE,
                 cmd_type=Motioncmd.Request.POSE_CMD,
@@ -547,7 +542,7 @@ class ExampleStrategy(Node):
                     )    
             if self.item[self.catch_num] =='G' :
                 res = self.motion_request_send(
-                    cmd_mode=Motioncmd.Request.PTP,
+                    cmd_mode=Motioncmd.Request.LINE,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
                     pose=self.order_up_pose(self.Sorting_palce[0]),
@@ -558,7 +553,7 @@ class ExampleStrategy(Node):
                         cmd_mode=Motioncmd.Request.PTP,
                         cmd_type=Motioncmd.Request.POSE_CMD,
                         base = self.base_state,
-                        pose=self.up_pose(uu_pose),
+                        pose=self.up_pose(relay_point),
                         holding=False
                         )
             else :                        
@@ -575,10 +570,10 @@ class ExampleStrategy(Node):
            
             # ------------------判斷-------------------
             self.catch_num+=1
-            print("放置物品",self.catch_num,"完成")  
+            print("放置完成")  
             del self.Sorting_palce[0]
             if self.Sorting_palce:
-                print('next')
+                print('下一個')
                 nest_state = States.SORT_AREA
             else:
                 if  self.order_area_num < 9:
@@ -620,21 +615,19 @@ class ExampleStrategy(Node):
                     print("沒有訂單，跳過")
                     nest_state = States.READ_ORDER
                 else :
-                    print('完無')
+                    print('無訂單')
                     nest_state = States.END_HOME_MOVE
             else:
                 for j, item in enumerate(self.oder_item):
                     if (self.oder_item[j] == 'NONE'):
                         if j == 0:
                             self.order_catch_palce_num+=1
-                        print("")
                     else:
                         row = self.order_map[item]
                         col = self.sort_count_map[item]
 
                         if j == 1:
                             col -= 1
-
                         x,y,z,rx,ry,rz = Sorting_area_base[row][col]
                         self.sort_count_map[item] += 1
                         self.Order_palce.append([x,y,z,rx,ry,rz])
@@ -703,13 +696,14 @@ class ExampleStrategy(Node):
                 nest_state = States.ORDER_OBJECT_AREA
             else:
                 nest_state = States.ORDER_RELAY_POINT
-            
+
+# ------------------------中計點---------------------
         elif state == States.ORDER_RELAY_POINT:
             es = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 base = self.base_state,
-                pose=self.up_pose(uu_pose),
+                pose=self.up_pose(relay_point),
                 holding=False
                 )       
             nest_state = States.ORDER_AREA
@@ -831,6 +825,7 @@ class ExampleStrategy(Node):
 
     def _main_loop(self):
         state = States.INIT
+        print("start button")
         while state != States.FINISH:
             state = self._state_machine(state)
             if state == None:
