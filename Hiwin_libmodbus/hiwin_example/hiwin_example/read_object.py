@@ -124,7 +124,15 @@ class ShapeClassifier(Node):
             'D': '圓柱', 'E': '三角柱', 'F': '六角柱',
             'G': '長方體（異常）', 'NONE': '無法分類'
         }
+        
+        self.last_msg = None  # 記錄上一次的訊息
 
+
+        
+    def smart_print(self,msg):
+        if msg != self.last_msg:
+            print(msg)
+            self.last_msg = msg
     # ---------------- Serial 讀取 & 分類 ----------------
     def read_serial_data(self):
         if self.serial_mgr.in_waiting == 0:
@@ -157,7 +165,7 @@ class ShapeClassifier(Node):
             self.latest_label = f"{label1} 與 {label2}"
 
             # 仍保留原本詳細 log，方便對照 ADC 與按鈕狀態
-            self.get_logger().info(
+            self.smart_print(
                 f"ADC1={adc1}, Buttons=({b1},{b2},{b3},{b4}) -> {code1} ({label1}); "
                 f"ADC2={adc2}, Buttons=({b5},{b6},{b7},{b8}) -> {code2} ({label2})"
             )
