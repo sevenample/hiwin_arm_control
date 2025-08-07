@@ -26,7 +26,7 @@ LINE_VELOCITY = 100
 LINE_ACCELERATION = 100
 
 
-HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 89.000]
+HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
 # 抓取物件數
 Number_of_grips = 2
 
@@ -54,10 +54,10 @@ Sorting_area_base = [
     ([404.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[320.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[235.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[ 152.0,  356.0,  78.0,  -180.0, 0.00, 89.00]), # B row
     ([404.0, 271.0,  20.0,  -180.0, 0.00, 89.00],[320.0, 271.0,  20.0,  -180.0, 0.00, 89.00],[235.0,  271.0,  20.0,  -180.0, 0.00, 89.00],[ 152.0,  271.0,  20.0,  -180.0, 0.00, 89.00]),  # C row
     ([-14.0, 463.0,  142.0, -180.0, 0.00, 89.00],[-98.0,  463.0,  142.0, -180.0, 0.00, 89.00],[-182.0,  463.0,  142.0, -180.0, 0.00, 89.00],[-266.0,  356.0,  78.0,  -180.0, 0.00, 89.00]),   # D row
-    ([70.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[-14.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[-98.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[-182.0,  356.0,  78.0,  -180.0, 0.00, 89.00]),   # E row
+    ([70.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[-14.0, 356.0,  78.0,  -180.0, 0.00, 89.00],[-98.0,  356.0,  78.0,  -180.0, 0.00, 89.00],[-182.0,  356.0, 98.0,  -180.0, 0.00, 89.00]),   # E row
     ([70.0,  271.0,  20.0,  -180.0, 0.00, 89.00],[-14.0, 271.0,  20.0,  -180.0, 0.00, 89.00],[-98.0,  271.0,  20.0,  -180.0, 0.00, 89.00],[-182.0,  271.0,  20.0,  -180.0, 0.00, 89.00]), # F row
 
-    ([430.0, 18.0,  40.0,  -180.0, 0.00, 89.00],[430.0,  -56.0,  40.0,  -180.0, 0.00, 89.00],[430.0,  -130.0,  40.0,  -180.0, 0.00, 89.00],[430.0,  -204.0,  40.0,  -180.0, 0.00, 89.00],[430.0,  -279.0,  40.0,  -180.0, 0.00, 89.00],[430.0,  -353.0,  40.0,  -180.0, 0.00, 89.00])
+    ([480.0, 18.0,  37.0,  -180.0, 0.00, 89.00],[480.0,  -56.0,  37.0,  -180.0, 0.00, 89.00],[480.0,  -130.0,  37.0,  -180.0, 0.00, 89.00],[480.0,  -204.0,  37.0,  -180.0, 0.00, 89.00],[480.0,  -279.0,  37.0,  -180.0, 0.00, 89.00],[480.0,  -353.0,  37.0,  -180.0, 0.00, 89.00])
       # G row
 ]
 
@@ -79,18 +79,18 @@ OBJECT_POSES = [
 
 #訂單放置
 ORDER_POSES = [
-    ([355.0,   5.0,   40.0,   -180.00, 0.00, 0.00]),
-    ([244.0,   8.0,  47.0,   -180.00, 0.00, 89.00]),
-    ([244.0,   -109.0,  40.0,   -180.00, 0.00, 89.00]),
+    ([396.0,   0.0,   34.0,   -180.00, 0.00, 0.00]),
+    ([288.0,   0.0,   34.0,   -180.00, 0.00, 89.00]),
+    ([288.0,  -88.0,  34.0,   -180.00, 0.00, 89.00]),
 
 
-    ([355.0,   -206.0,  40.0,   -180.00, 0.00, 0.00]),
-    ([244.0,    -199.0,  40.0,   -180.00, 0.00, 89.00]),
-    ([244.0,   -298.0,  40.0,   -180.00, 0.00, 89.00]),
+    ([396.0,   -201.0,  34.0,   -180.00, 0.00, 0.00]),
+    ([288.0,   -203.0,  34.0,   -180.00, 0.00, 89.00]),
+    ([288.0,   -301.0,  34.0,   -180.00, 0.00, 89.00]),
 
-    ([355.0,   -421.0,  40.0,   -180.00, 0.00, 0.00]),
-    ([244.0,   -414.0,  40.0,   -180.00, 0.00, 89.00]),
-    ([244.0,   -513.0,  40.0,   -180.00, 0.00, 89.00]),
+    ([396.0,   -430.0,  34.0,   -180.00, 0.00, 0.00]),
+    ([288.0,   -416.0,  34.0,   -180.00, 0.00, 89.00]),
+    ([288.0,   -513.0,  34.0,   -180.00, 0.00, 89.00]),
 ]
 
 base_point = OBJECT_POSES[3][:3]
@@ -210,12 +210,12 @@ class ExampleStrategy(Node):
 # ------------------------------------------
     def up_pose(self, pose):
         new_pose = pose.copy()
-        new_pose[2] = 200.0  
+        new_pose[2] = 210.0  
         return new_pose
     
     def order_up_pose(self, pose):
         new_pose = pose.copy()
-        new_pose[2] = 120.0  
+        new_pose[2] = 110.0  
         return new_pose
     
     def sort_up_pose(self, pose):
@@ -226,7 +226,7 @@ class ExampleStrategy(Node):
     def F_turn_pose(self, pose):
         new_pose = pose.copy()
         # new_pose[2] = 80.0
-        new_pose[1] -= 20.0  
+        new_pose[1] -= 30.0  
         return new_pose
 # -------------------------------------------
     
@@ -267,9 +267,7 @@ class ExampleStrategy(Node):
                 self.Correction_place(OBJECT_POSES)
                 self.Correction_sorting_place(Sorting_area_base)
                 self.Correction_place(ORDER_POSES)
-                self.Correction(HOME_POSE)
                 self.Correction(relay_point)
-                print(HOME_POSE)
             nest_state = States.HOME_MOVE
 
 
@@ -299,7 +297,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
+                base = 0,
                 pose=HOME_POSE,
                 holding=True
                 )
@@ -379,6 +377,9 @@ class ExampleStrategy(Node):
                     pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                     holding=False
                     )
+            else:
+                time.sleep(0.8)
+
             print("抓取物品",self.catch_count)
             self.item = self.catch_count
             # self.item = self.catch_items[:Number_of_grips]
@@ -419,11 +420,10 @@ class ExampleStrategy(Node):
 
         elif state == States.F_ERROR:
             for j ,item in enumerate(self.item):
-                if item != 'NONE':
-                    self.count_map[item] -= 1
-                    self.Sorting_palce = []
+                
 
-                if item == 'F':
+                if item  in ('F', 'D'):
+
                     self.F = 1
                     res1 = self.digital_request_send(
                         cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
@@ -435,6 +435,12 @@ class ExampleStrategy(Node):
                     )
 
             if self.F > 0 :
+                for j ,item in enumerate(self.item):
+                    if item != 'NONE':
+                        self.count_map[item] -= 1
+                        self.Sorting_palce = []
+                        self.catch_num = 0
+
                 for i in range(1,4):
                     res = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.LINE,
@@ -481,14 +487,13 @@ class ExampleStrategy(Node):
 # --------------------移動到分檢區域---------------------
         elif state == States.SORT_AREA:
             if self.item[self.catch_num] =='G':
-                if self.item != ['G', 'G']:
-                    es = self.motion_request_send(
-                        cmd_mode=Motioncmd.Request.PTP,
-                        cmd_type=Motioncmd.Request.POSE_CMD,
-                        base = self.base_state,
-                        pose=self.up_pose(relay_point),
-                        holding=False
-                        )
+                es = self.motion_request_send(
+                    cmd_mode=Motioncmd.Request.PTP,
+                    cmd_type=Motioncmd.Request.POSE_CMD,
+                    base = self.base_state,
+                    pose=self.up_pose(relay_point),
+                    holding=False
+                    )
                 res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -594,7 +599,7 @@ class ExampleStrategy(Node):
                     res = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
                         cmd_type=Motioncmd.Request.POSE_CMD,
-                        base = self.base_state,
+                        base = 0,
                         pose=HOME_POSE,
                         holding=True
                         )
@@ -786,7 +791,7 @@ class ExampleStrategy(Node):
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
+                base = 0,
                 pose=HOME_POSE,
                 holding=True
                 )

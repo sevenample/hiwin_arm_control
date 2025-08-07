@@ -22,8 +22,8 @@ ZONE_POSITIONS = {
     'B': QtCore.QRectF(290, 25, 130, 130),
     'C': QtCore.QRectF(170, 30, 120, 120),
     'D': QtCore.QRectF(30, 25, 130, 130),
-    'E': QtCore.QRectF(30, 160, 130, 130),
-    'F': QtCore.QRectF(160, 160, 130, 130),
+    'E': QtCore.QRectF(160, 160, 130, 130),
+    'F': QtCore.QRectF(30, 160, 130, 130),
 }
 
 

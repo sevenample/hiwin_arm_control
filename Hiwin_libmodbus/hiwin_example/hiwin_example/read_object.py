@@ -195,7 +195,7 @@ class ShapeClassifier(Node):
             #     return 'F'  # 六角柱（躺）
             else:
                 return 'D'  # 圓柱
-        elif 370 <= adc <= 460:
+        elif 360 <= adc <= 460:
             return 'E'  # 三角柱
         elif 200 <= adc <= 360:
             if b2 == 0 and adc > 330:
