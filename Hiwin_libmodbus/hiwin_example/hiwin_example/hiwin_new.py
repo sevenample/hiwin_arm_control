@@ -94,7 +94,7 @@ ORDER_POSES = [
 ]
 
 base_point = OBJECT_POSES[3][:3]
-
+order_point = ORDER_POSES [1][:3]
 
 class States(Enum):
     INIT = 0
@@ -228,22 +228,61 @@ class ExampleStrategy(Node):
         # new_pose[2] = 80.0
         new_pose[1] -= 30.0  
         return new_pose
-# -------------------------------------------
-    
+# ------------------PTP-------------------------
+    def OFFSET(self,pose,offset):
+        new_pose = pose.copy()
+        new_pose[2] += offset
+        return new_pose
+
+# ----------------PTP下降------------------------
+    def PTP_down_up(self,pose,base,hold):
+        arm =  1 
+        if pose [2]-arm[2] < 0.0:
+            symbol = -1
+        else : 
+            symbol = 1
+        offset =  int((pose [2]-arm[2])/0.5) 
+        for i in range ( offset ):
+            res = self.motion_request_send(
+                cmd_mode=Motioncmd.Request.PTP,
+                cmd_type=Motioncmd.Request.POSE_CMD,
+                base = base,
+                pose=self.OFFSET(arm,i*0.5*symbol),
+                holding=False
+                )
+        res = self.motion_request_send(
+                cmd_mode=Motioncmd.Request.PTP,
+                cmd_type=Motioncmd.Request.POSE_CMD,
+                base = base,
+                pose=pose,
+                holding=hold
+                )
+
+
+
 # ---------------校正-------------------
-    def Correction(self, pose):
+    def Correction_base(self, pose):
             pose[0] -= base_point[0]
             pose[1] -= base_point[1]
             pose[2] -= base_point[2]
+    
 
-    def Correction_sorting_place(self, pose):
+    def Correction_order (self, pose):
+            pose[0] -= order_point[0]
+            pose[1] -= order_point[1]
+            pose[2] -= order_point[2]
+
+    def Correction_base_sorting_place(self, pose):
             for row in pose:
                 for pose in row:
-                    self.Correction(pose)
+                    self.Correction_base(pose)
 
-    def Correction_place(self, pose):
+    def Correction_base_place(self, pose):
         for row in pose:
-            self.Correction(row)
+            self.Correction_base(row)
+    def Correction_order_place(self, pose):
+        for row in pose:
+            self.Correction_base(row)
 # ---------------------------------------------------
 
     def _state_machine(self, state: States) -> States:
@@ -264,10 +303,10 @@ class ExampleStrategy(Node):
             if correction:
                 self.base_state = 2
                 self.get_logger().info('CORRECTION !!!!!')
-                self.Correction_place(OBJECT_POSES)
-                self.Correction_sorting_place(Sorting_area_base)
-                self.Correction_place(ORDER_POSES)
-                self.Correction(relay_point)
+                self.Correction_base_place(OBJECT_POSES)
+                self.Correction_base_sorting_place(Sorting_area_base)
+                self.Correction_order_place(ORDER_POSES)
+                self.Correction_base(relay_point)
             nest_state = States.HOME_MOVE
 
 
