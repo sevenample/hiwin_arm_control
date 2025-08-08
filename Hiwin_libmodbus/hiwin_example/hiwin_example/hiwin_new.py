@@ -92,6 +92,7 @@ ORDER_POSES = [
     ([288.0,   -416.0,  34.0,   -180.00, 0.00, 89.00]),
     ([288.0,   -513.0,  34.0,   -180.00, 0.00, 89.00]),
 ]
+TEST_POSE = [0.00, 368.00, 100.00, -180.00, 0.00, 90.000]
 
 base_point = OBJECT_POSES[3][:3]
 order_point = ORDER_POSES [1][:3]
@@ -120,6 +121,7 @@ class States(Enum):
 
     ERROR_PLACE = 15
     ORDER_RELAY_POINT = 16
+    TEST = 100
 
 
 class ExampleStrategy(Node):
@@ -235,25 +237,32 @@ class ExampleStrategy(Node):
         return new_pose
 
 # ----------------PTP下降------------------------
-    def PTP_down_up(self,pose,base,hold):
-        arm =  1 
-        if pose [2]-arm[2] < 0.0:
+    def PTP_down_up(self,pose,bas,hold,ex):
+        # arm_state=self.read_request_send(
+        #     holding=True,
+        #     cmd_mode=Readcmd.Request.CHECK_POSE,
+        #     )
+        # arm = list(arm_state.current_position)
+
+        if pose [2]-ex[2] < 0.0:
             symbol = -1
         else : 
             symbol = 1
-        offset =  int((pose [2]-arm[2])/0.5) 
+        offset =  int((pose [2]-ex[2])/10*symbol) 
         for i in range ( offset ):
+            print(offset)
+            print(self.OFFSET(ex,i*10*symbol),)
             res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                base = base,
-                pose=self.OFFSET(arm,i*0.5*symbol),
+                base = bas,
+                pose=self.OFFSET(ex,i*10*symbol),
                 holding=False
                 )
         res = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
-                base = base,
+                base = bas,
                 pose=pose,
                 holding=hold
                 )
@@ -340,7 +349,13 @@ class ExampleStrategy(Node):
                 pose=HOME_POSE,
                 holding=True
                 )
+            arm_state=self.read_request_send(
+            holding=True,
+            cmd_mode=Readcmd.Request.CHECK_POSE,
+            )
             nest_state = States.OBJECT_AREA
+
+
 
 # -------------------移動到來料區----------------
         elif state == States.OBJECT_AREA:
@@ -371,16 +386,9 @@ class ExampleStrategy(Node):
         
 # -------------------夾取來料區---------------------
         elif state == States.CATCH_OBJECT:
+
             # -----------------下降--------------------
-            res = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=OBJECT_POSES[self.order_area_num],
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )
+            self.PTP_down_up(OBJECT_POSES[self.order_area_num],self.base_state,True,self.sort_up_pose(OBJECT_POSES[self.order_area_num]))
             # ---------------  氣閥夾取-----------------
             for i in range(1, 3):
                 res1 = self.digital_request_send(
@@ -401,14 +409,7 @@ class ExampleStrategy(Node):
         elif state == States.READ_OBJECT:
             if self.F != 0:
             # -------------------上升-------------------
-                res2 = self.motion_request_send(
-                    cmd_mode=Motioncmd.Request.LINE,
-                    cmd_type=Motioncmd.Request.POSE_CMD,
-                    base = self.base_state,
-                    pose=self.sort_up_pose(OBJECT_POSES[self.order_area_num]),
-                    holding=True,
-                    velocity=LINE_VELOCITY,
-                    acceleration=LINE_ACCELERATION)
+                self.PTP_down_up(self.sort_up_pose(OBJECT_POSES[self.order_area_num]),self.base_state,False,OBJECT_POSES[self.order_area_num])
                 res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -503,14 +504,7 @@ class ExampleStrategy(Node):
 
             else :      
                 # -------------------上升-------------------
-                res2 = self.motion_request_send(
-                    cmd_mode=Motioncmd.Request.LINE,
-                    cmd_type=Motioncmd.Request.POSE_CMD,
-                    base = self.base_state,
-                    pose=self.sort_up_pose(OBJECT_POSES[self.order_area_num]),
-                    holding=True,
-                    velocity=LINE_VELOCITY,
-                    acceleration=LINE_ACCELERATION)
+                self.PTP_down_up(self.sort_up_pose(OBJECT_POSES[self.order_area_num]),self.base_state,False,OBJECT_POSES[self.order_area_num])
                 res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -555,15 +549,7 @@ class ExampleStrategy(Node):
         elif state == States.SORT_PLACE:
              # -----------------下降--------------------
             print(f"放置 {self.item [self.catch_num]}")
-            res1 = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=self.Sorting_palce[0],
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )
+            self.PTP_down_up(self.Sorting_palce[0],self.base_state,True,self.up_pose(self.Sorting_palce[0]))
             # ---------------  氣閥放開-----------------
             if self.same:
                 for i in range(1, 3):
@@ -585,13 +571,7 @@ class ExampleStrategy(Node):
                     holding=True
                     )    
             if self.item[self.catch_num] =='G' :
-                res = self.motion_request_send(
-                    cmd_mode=Motioncmd.Request.LINE,
-                    cmd_type=Motioncmd.Request.POSE_CMD,
-                    base = self.base_state,
-                    pose=self.order_up_pose(self.Sorting_palce[0]),
-                    holding=False
-                    )
+                self.PTP_down_up(self.order_up_pose(self.Sorting_palce[0]),self.base_state,False,self.Sorting_palce[0])
                 if self.item[0] =='G' and self.item != ['G', 'G']:
                     es = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
@@ -602,15 +582,7 @@ class ExampleStrategy(Node):
                         )
             else :                        
                 # -------------------上升-------------------
-                res3 = self.motion_request_send(
-                    cmd_mode=Motioncmd.Request.LINE,
-                    cmd_type=Motioncmd.Request.POSE_CMD,
-                    base = self.base_state,
-                    pose=self.up_pose(self.Sorting_palce[0]),
-                    holding=False,
-                    velocity=LINE_VELOCITY,
-                    acceleration=LINE_ACCELERATION
-                    )
+                self.PTP_down_up(self.up_pose(self.Sorting_palce[0]),self.base_state,False,self.Sorting_palce[0])
            
             # ------------------判斷-------------------
             self.catch_num+=1
@@ -693,16 +665,10 @@ class ExampleStrategy(Node):
 
 # -------------------抓取訂單物品---------------------------
         elif state == States.ORDER_OBJECT_PICK:
+
             # -----------------下降--------------------
-            res = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=self.Order_palce[0],
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )        
+            self.PTP_down_up(self.Order_palce[0],self.base_state,True,self.up_pose(self.Order_palce[0]),self.up_pose(self.Order_palce[0]))
+    
             # ---------------  氣閥放開-----------------
             if self.same:
                 for i in range(1, 3):
@@ -724,15 +690,8 @@ class ExampleStrategy(Node):
                     holding=True
                     )
             # -------------------上升-------------------
-            res2 = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=self.up_pose(self.Order_palce[0]),
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )
+            self.PTP_down_up(self.up_pose(self.Order_palce[0]),self.base_state,False,self.Order_palce[0])
+
             print("抓取",self.order_catch_palce_num+1,"完畢")
             self.order_catch_palce_num += 1
             del self.Order_palce[0]
@@ -771,15 +730,7 @@ class ExampleStrategy(Node):
         elif state == States.ORDER_PLACE:
             # -----------------下降--------------------
             # self.get_logger().info('down')
-            res = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=ORDER_POSES[self.order_palce_num],
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )    
+            self.PTP_down_up(ORDER_POSES[self.order_palce_num],self.base_state,True,self.order_up_pose(ORDER_POSES[self.order_palce_num]))   
             # ---------------  氣閥放開-----------------
             for i in range(1, 3):
                 res1 = self.digital_request_send(
@@ -791,15 +742,8 @@ class ExampleStrategy(Node):
                     holding=True
                     )                
             # -------------------上升-------------------
-            res2 = self.motion_request_send(
-                cmd_mode=Motioncmd.Request.LINE,
-                cmd_type=Motioncmd.Request.POSE_CMD,
-                base = self.base_state,
-                pose=self.order_up_pose(ORDER_POSES[self.order_palce_num]),
-                holding=True,
-                velocity=LINE_VELOCITY,
-                acceleration=LINE_ACCELERATION
-                )
+            self.PTP_down_up(self.order_up_pose(ORDER_POSES[self.order_palce_num]),self.base_state,False,ORDER_POSES[self.order_palce_num])   
+
             res2 = self.motion_request_send(
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
