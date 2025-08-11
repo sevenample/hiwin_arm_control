@@ -169,14 +169,7 @@ class MultiOrderTrayWindow(QtWidgets.QWidget):
         self.summary_panel.setMaximumHeight(280)
         left_layout.addWidget(self.summary_panel)
 
-        self.tray_widget = QtWidgets.QLabel()
-        pixmap = QtGui.QPixmap("PN.jpg")
-        scaled_pixmap = pixmap.scaled(480, 371, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        self.tray_widget.setPixmap(scaled_pixmap)
-        self.tray_widget.setAlignment(QtCore.Qt.AlignCenter)
-        self.tray_widget.setScaledContents(True)
-        self.tray_widget.setStyleSheet("border-radius: 10px;")
-        left_layout.addWidget(self.tray_widget)
+
 
         self.result_panel = QtWidgets.QTextEdit()
         self.result_panel.setReadOnly(True)
