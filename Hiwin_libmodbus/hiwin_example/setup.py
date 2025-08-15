@@ -30,6 +30,8 @@ setup(
             'hiwin_new=hiwin_example.hiwin_new:main',
             'read_object=hiwin_example.read_object:main',
             'read=hiwin_example.order_sub:main',
+            'test=hiwin_example.hiwin_test:main',
+
         ],
     },
 )
