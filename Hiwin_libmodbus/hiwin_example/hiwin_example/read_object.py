@@ -243,14 +243,14 @@ def main(args=None):
     app = QtWidgets.QApplication(sys.argv)
 
     node = ShapeClassifier()
-    gui = ShapeGUI(node)
+    # gui = ShapeGUI(node)
 
     # Qt timer ‑> spin_once 讓 ROS 與 GUI 共用同一執行緒
     timer = QtCore.QTimer()
     timer.timeout.connect(lambda: rclpy.spin_once(node, timeout_sec=0))
     timer.start(10)
 
-    gui.show()
+    # gui.show()
     app.exec_()
 
     node.destroy_node()
