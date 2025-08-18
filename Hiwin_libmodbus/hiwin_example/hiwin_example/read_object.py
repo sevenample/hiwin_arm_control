@@ -122,7 +122,7 @@ class ShapeClassifier(Node):
         self.code_to_chinese = {
             'A': '大立方體', 'B': '中立方體', 'C': '小立方體',
             'D': '圓柱', 'E': '三角柱', 'F': '六角柱',
-            'G': '長方體（異常）', 'NONE': '無法分類'
+            'G': '長方體（異常）', 'NONE': '無法分類','I': '長方體（異常）'
         }
         
         self.last_msg = None  # 記錄上一次的訊息
@@ -180,13 +180,12 @@ class ShapeClassifier(Node):
             if b1 != 0 and b3 != 0:
                 return 'F'  # 六角柱
             else:
-                return 'A'  # 大立方體
-            # return 'A' if b1 == 0 else 'G'  # 大立方體或長方體
+                return 'A'  # 大立方體.
         elif adc >= 880:
             return 'F'  # 六角柱
         elif 790 <= adc <= 879:
             return 'B'  # if b2 == 0 else 'E'  # 中立方體
-        elif 550 <= adc <= 760:
+        elif 530 <= adc <= 760:
             if b4 == 0 or b2 == 0 or b3 == 0:
                 return 'G'  # 長方體（異常）
             # elif b1 == 0 and b3 != 0:
@@ -205,7 +204,7 @@ class ShapeClassifier(Node):
         elif 25 <= adc <= 200:
             return 'C'  # 小立方體
         elif adc < 25 and adc > 2:
-            return 'G'  # 小長方體（異常）
+            return 'I'  # 小長方體（異常）
         else:
             return 'NONE'
 
