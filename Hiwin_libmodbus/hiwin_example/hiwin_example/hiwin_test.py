@@ -19,7 +19,16 @@ import numpy as np
 import random
 import time
 # from YoloDetector import YoloDetectorActionClient
-
+# === 新增：GUI、執行緒鎖、與持久化 ===
+import threading
+import json
+import atexit
+from pathlib import Path
+try:
+    import tkinter as tk
+    from tkinter import ttk
+except Exception:
+    tk = None  # 若無圖形環境，GUI 自動停用
 DEFAULT_VELOCITY = 60
 DEFAULT_ACCELERATION = 60
 LINE_VELOCITY = 60
@@ -52,44 +61,71 @@ relay_point =[756.0, -52.0,  3.0,  -180.0, 0.00, 89.00]
 ERROR_relay_point =[-45.0,  0.0,  3.0,    -180.00, 0.00, 89.00]
 
 FRIST_POSE = [86.0,  -186.0,  240.0,    -180.00, 0.00, 89.00]
+x_offset = 0.0
+y_offset = -2.0
+z_offset = 0.0
+
 Sorting_area_base = [
-    ([672.0, 145.0,  123.0, -180.0, 0.00, 89.00],[588.0,  145.0,  123.0, -180.0, 0.00, 89.00],[ 504.0,  145.0,  123.0, -180.0, 0.00, 89.00],[ 420.0,  145.0,  123.0, -180.0, 0.00, 89.00]),  # A row
-    ([756.0, 40.0,  63.0,  -180.0, 0.00, 89.00],[672.0, 40.0,  63.0,  -180.0, 0.00, 89.00],[588.0,  40.0,  63.0,  -180.0, 0.00, 89.00],[ 504.0,  40.0,  63.0,  -180.0, 0.00, 89.00]), # B row
-    ([840.0, -52.0,  3.0,  -180.0, 0.00, 89.00],[756.0, -52.0,  3.0,  -180.0, 0.00, 89.00],[672.0, -52.0,  3.0,  -180.0, 0.00, 89.00],[588.0,  -52.0,  3.0,  -180.0, 0.00, 89.00]),  # C row
-    ([337.0, 145.0,  123.0, -180.0, 0.00, 89.00],[253.0,  145.0,  123.0, -180.0, 0.00, 89.00],[169.0,  145.0,  123.0, -180.0, 0.00, 89.00],[85.0,  145.0,  123.0,  -180.0, 0.00, 89.00]),   # D row
-    ([420.0,  40.0,  63.0,  -180.0, 0.00, 89.00],[337.0, 40.0,  63.0,  -180.0, 0.00, 89.00],[253.0,  40.0,  63.0,  -180.0, 0.00, 89.00],[169.0,  40.0, 80.0,  -180.0, 0.00, 89.00]),   # E row
-    ([504.0, -52.0,  3.0,  -180.0, 0.00, 89.00],[420.0, -52.0,  3.0,  -180.0, 0.00, 89.00],[337.0,-52.0,  3.0,  -180.0, 0.00, 89.00],[253.0, -52.0,  3.0,  -180.0, 0.00, 89.00]), # F row
+    ([672.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [588.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [504.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [420.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00]),  # A row
 
-    ([-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],[-45.0 ,163.0,  123.0,  -180.0, 0.00, 89.00],)      # G row
+    ([756.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [672.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [588.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [504.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00]),  # B row
+
+    ([840.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [756.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [672.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [588.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00]),  # C row
+
+    ([337.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [253.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [169.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],
+     [85.0 + x_offset, 145.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00]),  # D row
+
+    ([420.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [337.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [253.0 + x_offset, 40.0 + y_offset, 63.0 + z_offset, -180.0, 0.00, 89.00],
+     [169.0 + x_offset, 40.0 + y_offset, 80.0 + z_offset, -180.0, 0.00, 89.00]),  # E row
+
+    ([504.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [420.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [337.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
+     [253.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00]),  # F row
+
+    ([-45.0 + x_offset, 163.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],) * 7  # G row
 ]
 
-# 來料區點位
-
-OBJECT_POSES = [    
-    ([86.0,  -186.0,  3.0,    -180.00, 0.00, 89.00]),
-    ([-82.0,  -86.5,  3.0,    -180.00, 0.00, 89.00]),
-    ([-170.0,  11.5,  3.0,    -180.00, 0.00, 89.00]),
+OBJECT_POSES = [
+    ([86.0 + x_offset, -186.0 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-82.0 + x_offset, -86.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-170.0 + x_offset, 11.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
 ]
+
 
 #訂單放置
+x_order_offset = 0.0
+y_order_offset = 0.0
+z_order_offset = 0.0
+
 ORDER_POSES = [
-    [ 76.0,  417.0,  25.7, -180.0, 0.0, 0.0],
-    [-37.0, 420.0,  25.7, -180.0, 0.0, 89.0],
-    [-37.0, 332.0,  25.7, -180.0, 0.0, 89.0],
+    [ 76.0 + x_order_offset,  417.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 0.0],
+    [-37.0 + x_order_offset,  420.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
+    [-37.0 + x_order_offset,  332.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
 
-    [76.0,  202.0,  25.7, -180.0, 0.0, 0.0],
-    [-37.0, 207.0,  25.7, -180.0, 0.0, 89.0],
-    [-37.0, 119.0,  25.7, -180.0, 0.0, 89.0],
+    [ 76.0 + x_order_offset,  202.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 0.0],
+    [-37.0 + x_order_offset,  207.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
+    [-37.0 + x_order_offset,  119.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
 
-    [76.0,  -17.0,  25.7, -180.0, 0.0, 0.0],
-    [-37.0,   4.0,  25.7, -180.0, 0.0, 89.0],
-    [-37.0, -103.0, 25.7, -180.0, 0.0, 89.0],
+    [ 76.0 + x_order_offset,  -17.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 0.0],
+    [-37.0 + x_order_offset,    4.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
+    [-37.0 + x_order_offset, -103.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
 ]
 
-TEST_POSE = [0.00, 368.00, 100.00, -180.00, 0.00, 90.000]
 
-base_point = OBJECT_POSES[3][:3]
-order_point = ORDER_POSES [1][:3]
 
 class States(Enum):
     INIT = 0
@@ -175,6 +211,34 @@ class ExampleStrategy(Node):
         
         # 初始化統計數據
         self.catch_count = []
+
+        # ===================== 新增：雙 Base 偏移控制 =====================
+        # Base 3（分檢/來料）與 Base 2（訂單區）各自一組 ΔX/ΔY/ΔZ（mm）與開關
+        self._delta_lock = threading.Lock()
+        self.fine3_dx = 0.0
+        self.fine3_dy = 0.0
+        self.fine3_dz = 0.0
+        self.use_fine3 = True
+
+        self.fine2_dx = 0.0
+        self.fine2_dy = 0.0
+        self.fine2_dz = 0.0
+        self.use_fine2 = True
+
+        # === 新增：載入上次關閉前的偏移與啟用狀態 ===
+        self._offset_file = self._offsets_path()
+        self._load_offsets()  # 先嘗試載入（若檔案不存在就忽略）
+        atexit.register(self._save_offsets_safe)  # 關閉前再存一次（雙保險）
+
+        # 啟動左右並排 GUI（若有圖形環境）
+        if tk is not None:
+            threading.Thread(target=self._start_offset_gui, daemon=True).start()
+        else:
+            self.get_logger().info('No GUI environment detected; XYZ fine-tune window disabled.')
+        
+        self._debug_offsets = True  # 開/關：送動作時列印 base 與實際套用的 ΔXYZ
+
+        # ===============================================================
 # -----------------訂單--------------------------
     def order_callback(self, msg):
         flat_data = msg.item_names
@@ -236,21 +300,186 @@ class ExampleStrategy(Node):
         new_pose = pose.copy()
         new_pose[1] -= 5.0
         return new_pose
+    def Catch_Place(self, state):
+        res1 = self.digital_request_send(
+            cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+            # digital_input_pin=1,
+            digital_output_pin=IO[2],
+            digital_output_cmd=IO_STATE[state],
+            time_wait=0,
+            holding=False
+            )
+        res1 = self.digital_request_send(
+            cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
+            # digital_input_pin=1,
+            digital_output_pin=IO[4],
+            digital_output_cmd=IO_STATE[state],
+            time_wait=0,
+            holding=True
+            )
 
+# ===================== 新增：左右並排 GUI（Base3 左、Base2 右） =====================
+    def _start_offset_gui(self):
+        root = tk.Tk()
+        root.title("XYZ 微調 - 左 Base3（分檢/來料） / 右 Base2（訂單區）")
+        root.geometry("660x300")
+
+        step_var = tk.DoubleVar(value=1.0)
+        enabled3_var = tk.BooleanVar(value=self.use_fine3)
+        enabled2_var = tk.BooleanVar(value=self.use_fine2)
+
+        # 上方工具列（共用步進）
+        top = ttk.Frame(root); top.pack(fill="x", padx=8, pady=6)
+        ttk.Label(top, text="步進 (mm)：").pack(side="left")
+        ttk.Entry(top, textvariable=step_var, width=8).pack(side="left", padx=6)
+
+        # 左/右區塊
+        left = ttk.LabelFrame(root, text="Base 3（分檢/來料）"); left.pack(side="left", fill="both", expand=True, padx=8, pady=6)
+        right = ttk.LabelFrame(root, text="Base 2（訂單區）");  right.pack(side="left", fill="both", expand=True, padx=8, pady=6)
+
+        def apply_delta(base, axis, sign):
+            step = step_var.get()
+            with self._delta_lock:
+                if base == 3:
+                    if axis == 'x': self.fine3_dx += sign*step
+                    elif axis == 'y': self.fine3_dy += sign*step
+                    elif axis == 'z': self.fine3_dz += sign*step
+                elif base == 2:
+                    if axis == 'x': self.fine2_dx += sign*step
+                    elif axis == 'y': self.fine2_dy += sign*step
+                    elif axis == 'z': self.fine2_dz += sign*step
+                self._save_offsets_locked()
+            refresh_labels()
+
+        def reset_delta(base):
+            with self._delta_lock:
+                if base == 3:
+                    self.fine3_dx = self.fine3_dy = self.fine3_dz = 0.0
+                elif base == 2:
+                    self.fine2_dx = self.fine2_dy = self.fine2_dz = 0.0
+                self._save_offsets_locked()
+            refresh_labels()
+
+        def toggle_enabled(base, var):
+            with self._delta_lock:
+                if base == 3:
+                    self.use_fine3 = var.get()
+                elif base == 2:
+                    self.use_fine2 = var.get()
+                self._save_offsets_locked()
+            refresh_labels()
+
+        # 共用的小組件：每邊的 UI
+        def build_side(parent, base, enable_var):
+            ttk.Checkbutton(parent, text="啟用微調", variable=enable_var,
+                            command=lambda: toggle_enabled(base, enable_var)).grid(row=0, column=0, columnspan=3, sticky="w", padx=4, pady=2)
+
+            ttk.Label(parent, text="X").grid(row=1, column=0)
+            ttk.Button(parent, text="-", width=4, command=lambda: apply_delta(base, 'x', -1)).grid(row=1, column=1)
+            ttk.Button(parent, text="+", width=4, command=lambda: apply_delta(base, 'x', +1)).grid(row=1, column=2)
+
+            ttk.Label(parent, text="Y").grid(row=2, column=0)
+            ttk.Button(parent, text="-", width=4, command=lambda: apply_delta(base, 'y', -1)).grid(row=2, column=1)
+            ttk.Button(parent, text="+", width=4, command=lambda: apply_delta(base, 'y', +1)).grid(row=2, column=2)
+
+            ttk.Label(parent, text="Z").grid(row=3, column=0)
+            ttk.Button(parent, text="-", width=4, command=lambda: apply_delta(base, 'z', -1)).grid(row=3, column=1)
+            ttk.Button(parent, text="+", width=4, command=lambda: apply_delta(base, 'z', +1)).grid(row=3, column=2)
+
+            lbl_dx = ttk.Label(parent, text=""); lbl_dx.grid(row=4, column=0, columnspan=3, sticky="w")
+            lbl_dy = ttk.Label(parent, text=""); lbl_dy.grid(row=5, column=0, columnspan=3, sticky="w")
+            lbl_dz = ttk.Label(parent, text=""); lbl_dz.grid(row=6, column=0, columnspan=3, sticky="w")
+            lbl_state = ttk.Label(parent, text=""); lbl_state.grid(row=7, column=0, columnspan=3, sticky="w")
+
+            ttk.Button(parent, text="Reset", command=lambda: reset_delta(base)).grid(row=8, column=0, columnspan=3, pady=6)
+
+            return lbl_dx, lbl_dy, lbl_dz, lbl_state
+
+        lbl3_dx, lbl3_dy, lbl3_dz, lbl3_state = build_side(left, 3, enabled3_var)
+        lbl2_dx, lbl2_dy, lbl2_dz, lbl2_state = build_side(right, 2, enabled2_var)
+
+        def refresh_labels():
+            with self._delta_lock:
+                dx3, dy3, dz3, en3 = self.fine3_dx, self.fine3_dy, self.fine3_dz, self.use_fine3
+                dx2, dy2, dz2, en2 = self.fine2_dx, self.fine2_dy, self.fine2_dz, self.use_fine2
+            lbl3_dx.config(text=f"ΔX = {dx3:.3f} mm")
+            lbl3_dy.config(text=f"ΔY = {dy3:.3f} mm")
+            lbl3_dz.config(text=f"ΔZ = {dz3:.3f} mm")
+            lbl3_state.config(text=f"狀態：{'啟用' if en3 else '停用'}")
+            lbl2_dx.config(text=f"ΔX = {dx2:.3f} mm")
+            lbl2_dy.config(text=f"ΔY = {dy2:.3f} mm")
+            lbl2_dz.config(text=f"ΔZ = {dz2:.3f} mm")
+            lbl2_state.config(text=f"狀態：{'啟用' if en2 else '停用'}")
+
+        refresh_labels()
+        root.mainloop()
+# ============================================================================
+
+# ===================== 新增：偏移檔案 存取函式 =====================
+    def _offsets_path(self) -> Path:
+        # 存在執行檔同目錄：offsets.json
+        try:
+            base = Path(__file__).resolve().parent
+        except Exception:
+            base = Path.cwd()
+        return base / "offsets.json"
+
+    def _load_offsets(self):
+        p = self._offset_file
+        if not p.exists():
+            self.get_logger().info(f"No previous offsets file: {p}")
+            return
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            with self._delta_lock:
+                self.fine3_dx = float(data.get("fine3_dx", self.fine3_dx))
+                self.fine3_dy = float(data.get("fine3_dy", self.fine3_dy))
+                self.fine3_dz = float(data.get("fine3_dz", self.fine3_dz))
+                self.use_fine3 = bool(data.get("use_fine3", self.use_fine3))
+
+                self.fine2_dx = float(data.get("fine2_dx", self.fine2_dx))
+                self.fine2_dy = float(data.get("fine2_dy", self.fine2_dy))
+                self.fine2_dz = float(data.get("fine2_dz", self.fine2_dz))
+                self.use_fine2 = bool(data.get("use_fine2", self.use_fine2))
+            self.get_logger().info(
+                f"Offsets loaded from {p}: "
+                f"base3 Δ=({self.fine3_dx},{self.fine3_dy},{self.fine3_dz}) en={self.use_fine3}; "
+                f"base2 Δ=({self.fine2_dx},{self.fine2_dy},{self.fine2_dz}) en={self.use_fine2}"
+            )
+        except Exception as e:
+            self.get_logger().warn(f"Failed to load offsets from {p}: {e}")
+
+    def _save_offsets_locked(self):
+        # 呼叫前已拿到 self._delta_lock
+        p = self._offset_file
+        data = {
+            "fine3_dx": self.fine3_dx, "fine3_dy": self.fine3_dy, "fine3_dz": self.fine3_dz, "use_fine3": self.use_fine3,
+            "fine2_dx": self.fine2_dx, "fine2_dy": self.fine2_dy, "fine2_dz": self.fine2_dz, "use_fine2": self.use_fine2,
+        }
+        try:
+            p.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            self.get_logger().warn(f"Failed to save offsets to {p}: {e}")
+
+    def _save_offsets_safe(self):
+        # 安全儲存（供 atexit 使用）
+        with self._delta_lock:
+            self._save_offsets_locked()
+# ============================================================================
 # ---------------------------------------------------
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
-            # res2 = self.digital_request_send(
-            #         cmd_mode=Digitalcmd.Request.READ_DI,
-            #         digital_input_pin=2,
-            #         holding=False
-            #         )
-            # if res2.digital_state == 1:
-            self.get_logger().info('INIT')
-            #     nest_state = States.HOME_MOVE
-            # else :
-            nest_state = States.INIT
+            res2 = self.digital_request_send(
+                    cmd_mode=Digitalcmd.Request.READ_DI,
+                    digital_input_pin=2,
+                    holding=False
+                    )
+            if res2.digital_state == 1:
+                self.get_logger().info('INIT')
+                nest_state = States.HOME_MOVE
+            else :
+                nest_state = States.INIT
 
 # ------------------回家-------------------
         elif state == States.HOME_MOVE:
@@ -316,7 +545,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 base = self.base_state,
-                pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                 holding=False,
                 velocity=DEFAULT_VELOCITY,
                 acceleration=DEFAULT_ACCELERATION,
@@ -353,8 +582,8 @@ class ExampleStrategy(Node):
                     base = self.base_state,
                     pose=self.F_turn_pose(OBJECT_POSES[self.order_area_num]),
                     holding=True,
-                    velocity=DEFAULT_VELOCITY,
-                    acceleration=DEFAULT_ACCELERATION,
+                    velocity=80,
+                    acceleration=80         ,
                 )
             # ---------------  氣閥夾取-----------------
             # for i in range(1, 3):
@@ -389,7 +618,7 @@ class ExampleStrategy(Node):
  # ----------------------辨識物品-----------------------
 
         elif state == States.READ_OBJECT:
-            if self.F != 0:
+            if self.F == 0:
             # -------------------上升-------------------
                 self.res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.LINE,
@@ -404,7 +633,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
@@ -414,7 +643,7 @@ class ExampleStrategy(Node):
 
             print("抓取物品",self.catch_count)
             self.item = self.catch_count
-            self.item = self.catch_items[:Number_of_grips]
+            # self.item = self.catch_items[:Number_of_grips]
             for j, item in enumerate(self.item):
                 if item == 'NONE':
                     res2 = self.digital_request_send(
@@ -509,7 +738,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
@@ -666,7 +895,7 @@ class ExampleStrategy(Node):
                     # self.SORT_OFFSET(Sorting_area_base)
                     nest_state = States.READ_ORDER
                     self.get_logger().info('分檢完成')
-                    self.oder_items = ['E', 'E', 'D', 'B', 'F', 'A', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE', 'NONE']
+                    self.oder_items = [['A', 'E'],[ 'D', 'B'], ['F', 'A'],['A', 'E']]
                     self.catch_num = 0
 
 
@@ -881,7 +1110,8 @@ class ExampleStrategy(Node):
                     time_wait=0,
                     holding=True
                     )
-
+            # 關閉前再存一次
+            self._save_offsets_safe()
             
             self.res = self.motion_request_send(cmd_mode=Motioncmd.Request.CLOSE)
             nest_state = States.FINISH
@@ -897,8 +1127,6 @@ class ExampleStrategy(Node):
         state = States.INIT
         print("Start button")
         while state != States.FINISH:
-            print("Error: Invalid state transition")
-
             state = self._state_machine(state)
             if state == None:
                 break
@@ -943,6 +1171,34 @@ class ExampleStrategy(Node):
         [pose_.linear.x, pose_.linear.y, pose_.linear.z] = pose[0:3]
         [pose_.angular.x, pose_.angular.y, pose_.angular.z] = pose[3:6]
         
+        # ================= 套用【分 Base】XYZ 偏移（mm） =================
+        pose_to_send = pose
+        applied_dx = applied_dy = applied_dz = 0.0  # 記錄實際套用的偏移
+        if pose[0] != float('inf'):
+            pose_to_send = pose.copy()
+            with self._delta_lock:
+                if base == 3 and self.use_fine3:
+                    applied_dx, applied_dy, applied_dz = self.fine3_dx, self.fine3_dy, self.fine3_dz
+                elif base == 2 and self.use_fine2:
+                    applied_dx, applied_dy, applied_dz = self.fine2_dx, self.fine2_dy, self.fine2_dz
+            pose_to_send[0] += applied_dx
+            pose_to_send[1] += applied_dy
+            pose_to_send[2] += applied_dz
+        # ===============================================================
+
+        # 新增：列印這一步實際使用的 base 與套用的 ΔXYZ 與 from->to
+        if getattr(self, "_debug_offsets", False):
+            try:
+                self.get_logger().info(
+                    f"[motion] base={base}  Δ=({applied_dx:.3f},{applied_dy:.3f},{applied_dz:.3f})  "
+                    f"from=({pose[0]:.3f},{pose[1]:.3f},{pose[2]:.3f}) -> to=({pose_to_send[0]:.3f},{pose_to_send[1]:.3f},{pose_to_send[2]:.3f})"
+                )
+            except Exception:
+                print(f"[motion] base={base} Δ=({applied_dx},{applied_dy},{applied_dz}) -> {pose_to_send[:3]}")
+
+        pose_ = Twist()
+        [pose_.linear.x, pose_.linear.y, pose_.linear.z] = pose_to_send[0:3]
+        [pose_.angular.x, pose_.angular.y, pose_.angular.z] = pose_to_send[3:6]
         request.pose = pose_
         request.joints = joints
         request.circ_s = circ_s
