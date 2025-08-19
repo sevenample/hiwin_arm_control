@@ -165,8 +165,8 @@ class ExampleStrategy(Node):
         self.hiwin_client_di = self.create_client(Digitalcmd, 'digitalcmd')
         self.hiwin_client_rd = self.create_client(Readcmd, 'readcmd')
         
-        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1,  'H': 10}
-        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6 , 'H': 6}
+        self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1,  'H': 1 , 'I':1}
+        self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6 , 'H': 6 , 'I':6}
 
         self.catch_items = ['A'] * 1 + ['B'] * 1 + ['C'] * 1 + ['D'] * 1 + ['E'] * 1 + ['F'] * 1 + ['G'] * 1
         random.shuffle(self.catch_items)
@@ -531,7 +531,7 @@ class ExampleStrategy(Node):
 
 # -------------------移動到來料區----------------
         elif state == States.OBJECT_AREA:
-            if self.item[1] in ('G','H'):
+            if self.item[1] in ('G','H','I'):
                 res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -697,7 +697,7 @@ class ExampleStrategy(Node):
 
             if self.F > 0 :
                 for j ,item in enumerate(self.item):
-                    if item not in ('NONE', 'H'):
+                    if item not in ('NONE', 'H','I'):
                         self.count_map[item] -= 1
                         self.Sorting_palce = []
                         self.catch_num = 0
@@ -752,7 +752,7 @@ class ExampleStrategy(Node):
         elif state == States.SORT_AREA:
             del self.catch_items[:Number_of_grips]
 
-            if self.item[self.catch_num] in ('H','G'):
+            if self.item[self.catch_num] in ('H','G','I'):
                 es = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -1147,7 +1147,7 @@ class ExampleStrategy(Node):
             cmd_type=Motioncmd.Request.POSE_CMD,
             velocity=DEFAULT_VELOCITY,
             acceleration=DEFAULT_ACCELERATION,
-            tool=1,
+            tool=0,
             base=0,
             pose=[float('inf')]*6,
             joints=[float('inf')]*6,

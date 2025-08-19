@@ -31,8 +31,8 @@ try:
 except Exception:
     tk = None  # 若無圖形環境，GUI 自動停用
 
-DEFAULT_VELOCITY = 60
-DEFAULT_ACCELERATION = 60
+DEFAULT_VELOCITY = 70
+DEFAULT_ACCELERATION = 70
 LINE_VELOCITY = 100
 LINE_ACCELERATION = 100
 
@@ -98,7 +98,7 @@ Sorting_area_base = [
      [337.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00],
      [253.0 + x_offset, -52.0 + y_offset, 3.0 + z_offset, -180.0, 0.00, 89.00]),  # F row
 
-    ([-45.0 + x_offset, 163.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],) * 7  # G row
+    ([-45.0 + x_offset, 163.0 + y_offset, 123.0 + z_offset, -180.0, 0.00, 89.00],) * 200  # G row
 ]
 
 OBJECT_POSES = [    
@@ -129,15 +129,10 @@ ORDER_POSES = [
     [-37.0 + x_order_offset,  207.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
     [-37.0 + x_order_offset,  119.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
 
-    [ 76.0 + x_order_offset,  -17.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 0.0],
+    [ 76.0 + x_order_offset,  -13.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 0.0],
     [-37.0 + x_order_offset,    4.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
     [-37.0 + x_order_offset, -103.0 + y_order_offset,  25.7 + z_order_offset, -180.0, 0.0, 89.0],
 ]
-
-TEST_POSE = [0.00, 368.00, 100.00, -180.00, 0.00, 90.000]
-
-base_point = OBJECT_POSES[3][:3]
-order_point = ORDER_POSES [1][:3]
 
 class States(Enum):
     INIT = 0
@@ -307,7 +302,7 @@ class ExampleStrategy(Node):
     def F_turn_pose(self, pose):
         new_pose = pose.copy()
         # new_pose[2] = 80.0
-        new_pose[1] -= 55.0  
+        new_pose[1] -= 57.0  
         return new_pose
     
     def sort_offset(self, pose):
@@ -546,7 +541,7 @@ class ExampleStrategy(Node):
 
 # -------------------移動到來料區----------------
         elif state == States.OBJECT_AREA:
-            if self.item[1] in ('G','H'):
+            if self.item[1] in ('G','H','I'):
                 res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -597,8 +592,8 @@ class ExampleStrategy(Node):
                     base = self.base_state,
                     pose=self.F_turn_pose(OBJECT_POSES[self.order_area_num]),
                     holding=True,
-                    velocity=80,
-                    acceleration=80,
+                    velocity=60,
+                    acceleration=60,
                 )
             # ---------------  氣閥夾取-----------------
             self.Catch_Place(1)
@@ -659,13 +654,16 @@ class ExampleStrategy(Node):
                     x,y,z,rx,ry,rz = Sorting_area_base[row][col]
                     self.count_map[item] += 1
                     self.Sorting_palce.append([x,y,z,rx,ry,rz])
-            print(f"🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
             if self.F == 0 :
                 nest_state = States.F_ERROR
+                print(f"🔷 [第 {self.order_area_num+1} 次抓取]：{self.item}")
+
             else : 
                 self.order_area_num += 1
                 self.same = self.same_thing (self.Sorting_palce)
                 self.F = 0
+                print(f"🔷 [回正後第 {self.order_area_num+1} 次抓取]：{self.item}")
+
                 nest_state = States.SORT_AREA
 
 
@@ -737,8 +735,8 @@ class ExampleStrategy(Node):
         elif state == States.SORT_AREA:
             del self.catch_items[:Number_of_grips]
 
-            if self.item[self.catch_num] in ('H','G'):
-                es = self.motion_request_send(
+            if self.item[self.catch_num] in ('H','G','I'):
+                res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
@@ -752,7 +750,7 @@ class ExampleStrategy(Node):
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
                     pose=self.Sorting_palce[0],
-                    holding=True,
+                    holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
                 )
@@ -792,7 +790,7 @@ class ExampleStrategy(Node):
                     time_wait=0,
                     holding=True
                     )    
-            if self.item[self.catch_num] in ('H','G'):
+            if self.item[self.catch_num] in ('H','G','I'):
                 self.res = self.motion_request_send(
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
@@ -867,7 +865,7 @@ class ExampleStrategy(Node):
             if self.oder_item == ['NONE', 'NONE']:
                 self.order_palce_num += 1
                 if self.oder_items :
-                    print("沒有訂單，跳過")
+                    print("沒有訂單，跳過\n")
                     nest_state = States.READ_ORDER
                 else :
                     print('無訂單')
@@ -1075,7 +1073,7 @@ class ExampleStrategy(Node):
             cmd_type=Motioncmd.Request.POSE_CMD,
             velocity=DEFAULT_VELOCITY,
             acceleration=DEFAULT_ACCELERATION,
-            tool=1,
+            tool=0,
             base=0,
             pose=[float('inf')]*6,
             joints=[float('inf')]*6,
@@ -1114,9 +1112,8 @@ class ExampleStrategy(Node):
         # 新增：列印這一步實際使用的 base 與套用的 ΔXYZ 與 from->to
         if getattr(self, "_debug_offsets", False):
             try:
-                self.get_logger().info(
-                    f"[motion] base={base}  Δ=({applied_dx:.3f},{applied_dy:.3f},{applied_dz:.3f})  "
-                    f"from=({pose[0]:.3f},{pose[1]:.3f},{pose[2]:.3f}) -> to=({pose_to_send[0]:.3f},{pose_to_send[1]:.3f},{pose_to_send[2]:.3f})"
+                print(
+                    f"=({pose[0]:.1f},{pose[1]:.1f},{pose[2]:.1f}) -> =({pose_to_send[0]:.1f},{pose_to_send[1]:.1f},{pose_to_send[2]:.1f})"
                 )
             except Exception:
                 print(f"[motion] base={base} Δ=({applied_dx},{applied_dy},{applied_dz}) -> {pose_to_send[:3]}")
