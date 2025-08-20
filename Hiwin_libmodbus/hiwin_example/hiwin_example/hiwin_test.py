@@ -29,10 +29,10 @@ try:
     from tkinter import ttk
 except Exception:
     tk = None  # 若無圖形環境，GUI 自動停用
-DEFAULT_VELOCITY = 60
-DEFAULT_ACCELERATION = 60
-LINE_VELOCITY = 60
-LINE_ACCELERATION = 60
+DEFAULT_VELOCITY = 100
+DEFAULT_ACCELERATION = 100
+LINE_VELOCITY = 100
+LINE_ACCELERATION = 100
 
 
 HOME_POSE = [0.00, 368.00, 293.00, -180.00, 0.00, 90.000]
@@ -101,8 +101,9 @@ Sorting_area_base = [
 
 OBJECT_POSES = [
     ([86.0 + x_offset, -186.0 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([  86.0 + x_offset,   -88.0 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
     ([-82.0 + x_offset, -86.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
-    ([-170.0 + x_offset, 11.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-166.0 + x_offset, 11.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
 ]
 
 
@@ -168,7 +169,7 @@ class ExampleStrategy(Node):
         self.count_map = {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1,  'H': 1 , 'I':1}
         self.order_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6 , 'H': 6 , 'I':6}
 
-        self.catch_items = ['A'] * 1 + ['B'] * 1 + ['C'] * 1 + ['D'] * 1 + ['E'] * 1 + ['F'] * 1 + ['G'] * 1
+        self.catch_items = ['A'] * 2 + ['B'] * 1 + ['C'] * 1 + ['D'] * 1 + ['E'] * 1 + ['F'] * 1 + ['G'] * 3
         random.shuffle(self.catch_items)
 
         self.order_area_num = 0
@@ -545,7 +546,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 base = self.base_state,
-                pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
+                pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
                 holding=False,
                 velocity=DEFAULT_VELOCITY,
                 acceleration=DEFAULT_ACCELERATION,
@@ -582,8 +583,8 @@ class ExampleStrategy(Node):
                     base = self.base_state,
                     pose=self.F_turn_pose(OBJECT_POSES[self.order_area_num]),
                     holding=True,
-                    velocity=80,
-                    acceleration=80         ,
+                    velocity=60,
+                    acceleration=60         ,
                 )
             # ---------------  氣閥夾取-----------------
             # for i in range(1, 3):
@@ -633,7 +634,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
@@ -676,6 +677,8 @@ class ExampleStrategy(Node):
             self.order_area_num += 1
             self.same = self.same_thing (self.Sorting_palce)
             self.F = 0
+            del self.catch_items[:2]
+
             nest_state = States.SORT_AREA
 
 
@@ -738,7 +741,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num]),
+                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
@@ -750,7 +753,6 @@ class ExampleStrategy(Node):
 
 # --------------------移動到分檢區域---------------------
         elif state == States.SORT_AREA:
-            del self.catch_items[:Number_of_grips]
 
             if self.item[self.catch_num] in ('H','G','I'):
                 es = self.motion_request_send(
@@ -857,7 +859,7 @@ class ExampleStrategy(Node):
                 print('下一個')
                 nest_state = States.SORT_AREA
             else:
-                if  self.order_area_num < 3:
+                if  self.order_area_num < 4:
                     for i in range(1, 3):
                         res2 = self.digital_request_send(
                             cmd_mode=Digitalcmd.Request.DIGITAL_OUTPUT,
@@ -895,7 +897,7 @@ class ExampleStrategy(Node):
                     # self.SORT_OFFSET(Sorting_area_base)
                     nest_state = States.READ_ORDER
                     self.get_logger().info('分檢完成')
-                    self.oder_items = [['A', 'E'],[ 'D', 'B'], ['F', 'A'],['A', 'E']]
+                    self.oder_items = [['A', 'E'],[ 'D', 'B'], ['F', 'C'],['A', 'E']]
                     self.catch_num = 0
 
 

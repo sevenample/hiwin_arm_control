@@ -31,8 +31,8 @@ try:
 except Exception:
     tk = None  # 若無圖形環境，GUI 自動停用
 
-DEFAULT_VELOCITY = 70
-DEFAULT_ACCELERATION = 70
+DEFAULT_VELOCITY = 100
+DEFAULT_ACCELERATION = 100
 LINE_VELOCITY = 100
 LINE_ACCELERATION = 100
 
@@ -109,9 +109,9 @@ OBJECT_POSES = [
     ([ -82.0 + x_offset,   -86.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
     ([ -82.0 + x_offset,    11.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
 
-    ([-170.0 + x_offset,  -184.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
-    ([-170.0 + x_offset,   -86.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
-    ([-170.0 + x_offset,    11.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-166.0 + x_offset,  -184.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-166.0 + x_offset,   -86.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([-166.0 + x_offset,    11.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
 ]
 
 
@@ -302,7 +302,7 @@ class ExampleStrategy(Node):
     def F_turn_pose(self, pose):
         new_pose = pose.copy()
         # new_pose[2] = 80.0
-        new_pose[1] -= 57.0  
+        new_pose[1] -= 55.0  
         return new_pose
     
     def sort_offset(self, pose):
@@ -693,8 +693,8 @@ class ExampleStrategy(Node):
                         base = self.base_state,
                         pose=self.F_turn_pose(OBJECT_POSES[self.order_area_num]),
                         holding=False,
-                        velocity=50,
-                        acceleration=50,
+                        velocity=70,
+                        acceleration=70,
                         )
                     self.res = self.motion_request_send(
                         cmd_mode=Motioncmd.Request.PTP,
@@ -702,8 +702,8 @@ class ExampleStrategy(Node):
                         base = self.base_state,
                         pose=OBJECT_POSES[self.order_area_num],
                         holding=True,
-                        velocity=50,
-                        acceleration=50,
+                        velocity=70,
+                        acceleration=70,
                         )
                 nest_state = States.CATCH_OBJECT
 
@@ -1113,7 +1113,7 @@ class ExampleStrategy(Node):
         if getattr(self, "_debug_offsets", False):
             try:
                 print(
-                    f"=({pose[0]:.1f},{pose[1]:.1f},{pose[2]:.1f}) -> =({pose_to_send[0]:.1f},{pose_to_send[1]:.1f},{pose_to_send[2]:.1f})"
+                    f"{pose_to_send[0]:.1f},{pose_to_send[1]:.1f},{pose_to_send[2]:.1f})"
                 )
             except Exception:
                 print(f"[motion] base={base} Δ=({applied_dx},{applied_dy},{applied_dz}) -> {pose_to_send[:3]}")
