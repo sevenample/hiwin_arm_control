@@ -105,7 +105,12 @@ OBJECT_POSES = [
     ([-82.0 + x_offset, -86.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
     ([-166.0 + x_offset, 11.5 + y_offset, 3.0 + z_offset, -180.00, 0.00, 89.00]),
 ]
-
+OBJECT_POSES_test = [    
+    ([  86.0 + x_offset,  -186.0 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([  86.0 + x_offset,   -88.0 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([  86.0 + x_offset,   -88.0 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+    ([ -82.0 + x_offset,    11.5 + y_offset,  3.0 + z_offset, -180.00, 0.00, 89.00]),
+]
 
 #訂單放置
 x_order_offset = 0.0
@@ -546,7 +551,7 @@ class ExampleStrategy(Node):
                 cmd_mode=Motioncmd.Request.PTP,
                 cmd_type=Motioncmd.Request.POSE_CMD,
                 base = self.base_state,
-                pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                pose=self.up_pose(OBJECT_POSES_test[self.order_area_num]),
                 holding=False,
                 velocity=DEFAULT_VELOCITY,
                 acceleration=DEFAULT_ACCELERATION,
@@ -634,7 +639,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                    pose=self.up_pose(OBJECT_POSES_test[self.order_area_num]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
@@ -741,7 +746,7 @@ class ExampleStrategy(Node):
                     cmd_mode=Motioncmd.Request.PTP,
                     cmd_type=Motioncmd.Request.POSE_CMD,
                     base = self.base_state,
-                    pose=self.up_pose(OBJECT_POSES[self.order_area_num if self.order_area_num <= 2 else self.order_area_num - 3]),
+                    pose=self.up_pose(OBJECT_POSES_test[self.order_area_num]),
                     holding=False,
                     velocity=DEFAULT_VELOCITY,
                     acceleration=DEFAULT_ACCELERATION,
